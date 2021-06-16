@@ -10,7 +10,7 @@
     "build": "concurrently npm build-*",
     "build-client": "npm run build --prefix client"
   },
-  "author": "Kushnir Bogdan",
+  "author": "Kushnir Bogdan, Vladislav Rossikhin",
   "license": "ISC",
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
