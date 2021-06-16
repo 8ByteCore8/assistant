@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "skipLibCheck": true,
+        "module": "CommonJS",
+        "emitDecoratorMetadata": true,
+        "removeComments": true,
+        "esModuleInterop": true,
+        "rootDir": "./",
+        "target": "ES6",
+        "moduleResolution": "Node",
+        "experimentalDecorators": true,
+    },
+    "exclude": [
+        "node_modules",
+    ]
+}
