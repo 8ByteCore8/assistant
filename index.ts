@@ -5,7 +5,6 @@ import { ParsedQs } from "qs";
 import config from "./config";
 import { User } from "./models/User";
 import auth from "./middlewares/auth.middleware";
-import { models } from "./models";
 
 
 
@@ -34,6 +33,8 @@ async function main() {
     app.use(json());
     app.use(urlencoded({ extended: true }));
     app.use(auth());
+
+    // app.use("/api",)
 
 
     app.listen(config.port, () => console.log("Server started."));

@@ -64,6 +64,7 @@ export class User extends MyBaseEntity {
     public active: boolean;
 
     @Column({
+        type: "varchar",
         length: 75,
     })
     public role: Roles;
