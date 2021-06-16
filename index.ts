@@ -1,10 +1,10 @@
 import { createConnection } from "typeorm";
-import express, { json, Request as ExpressRequest, Response as ExpressResponse, urlencoded } from "express";
+import express, { Request as ExpressRequest, Response as ExpressResponse } from "express";
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
 import config from "./config";
-import { User } from "./models/User";
-import auth from "./middlewares/auth.middleware";
+import { User } from "./models/account/User";
+import apiRouter from "./routers/api.router";
 
 
 
@@ -12,7 +12,8 @@ import auth from "./middlewares/auth.middleware";
  * Локальные переменные ответа.
  */
 type Locals = {
-    user: User | false;
+    user: User;
+    permissions: string[];
 };
 
 /**
@@ -30,11 +31,8 @@ async function main() {
 
     const app = express();
 
-    app.use(json());
-    app.use(urlencoded({ extended: true }));
-    app.use(auth());
 
-    // app.use("/api",)
+    app.use("/api", apiRouter);
 
 
     app.listen(config.port, () => console.log("Server started."));

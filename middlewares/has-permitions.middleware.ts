@@ -1,8 +1,9 @@
 import { Request, Response } from "..";
 import { NextHandleFunction } from 'connect';
-import { Permission } from "../models/Permission";
-import { getManager } from "typeorm";
-import { User } from "../models/User";
+import { Permission } from "../models/account/Permission";
+import { User } from "../models/account/User";;
+import { NextFunction } from "express";
+import { PermissionsDeniedError } from "../errors";
 
 /**
  * Функция для проверки прав доступа.
@@ -27,7 +28,7 @@ export type PermissionValidator = Object | Array<PermissionValidator> | string |
  * @param permissions Список прав доступа пользователя.
  * @returns true - Пользователь может выполнить действие, иначе - false.
  */
-async function validatePermissions(permission: PermissionValidator, user: User, permissions: string[]): Promise<boolean> {
+export async function validatePermissions(permission: PermissionValidator, user: User, permissions: string[]): Promise<boolean> {
     if (typeof permission === "string")
         return permission in permissions;
     else if (typeof permission === "function")
@@ -50,51 +51,55 @@ async function validatePermissions(permission: PermissionValidator, user: User, 
 }
 
 /**
+ * Извлекает права доступа из базы и записывает в locals.
+ */
+export function permissions(): NextHandleFunction {
+    return async function (request: Request, response: Response, next: NextFunction) {
+        try {
+            let user = response.locals["user"];
+
+            if (user) {
+                // Права доступа пользователя
+                let all_permissions: Permission[] = await User.getAllPermissions(user);
+
+                // Названия прав доступа
+                response.locals["permissions"] = [];
+                for (const permission of all_permissions)
+                    response.locals["permissions"].push(permission.name);
+            }
+            else
+                response.locals["permissions"] = undefined;
+
+            next();
+        } catch (error) {
+            next(error);
+        }
+    };
+};
+
+/**
  * Проверяет права доступа пользователя.
  * @param permissions Список необходимых разрешений.
  */
 export default function hasPermissions(permission: PermissionValidator): NextHandleFunction {
-    return async function (request: Request, response: Response, next: Function) {
+    return async function (request: Request, response: Response, next: NextFunction) {
         try {
-
-
             let user = response.locals["user"];
+            let permissions = response.locals["permissions"];
 
-            if (user) {
+            if (permissions) {
                 // Суперпользователю можно всё. Зачем на него тратить время?
                 if (user.superuser)
                     return next();
 
-                // Права доступа пользователя
-                let user_permissions: Permission[] = await getManager().query([
-                    "SELECT permission",
-                    "FROM permission",
-                    "LEFT OUTER JOIN user",
-                    `ON user.id = ${user.id}`,
-                    "LEFT OUTER JOIN user_permission_permission",
-                    "ON user_permission_permission.permissionId = permission.id",
-                    "AND user_permission_permission.userId = user.id",
-                    "LEFT OUTER JOIN group_permission_permission",
-                    "ON group_permission_permission.permissionId = permission.id",
-                    "AND group_permission_permission.groupId = user.groupId",
-                    "WHERE permission.id = user_permission_permission.permissionId",
-                    "OR permission.id = group_permission_permission.permissionId",
-                ].join(" "));
-
-                // Названия прав доступа
-                let permissions_names: string[] = [];
-                for (const permission of user_permissions)
-                    permissions_names.push(permission.name);
-
                 // Проверка наличия всех необходимых прав
-                if (await validatePermissions(permission, user, permissions_names))
-
+                if (await validatePermissions(permission, user, response.locals["permissions"]))
                     return next();
+
             }
-            throw new Error("Permissions denied");
+            throw new PermissionsDeniedError();
         }
         catch (error) {
-            next(error);
         }
     };
 }

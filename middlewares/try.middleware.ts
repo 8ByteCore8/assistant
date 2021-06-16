@@ -7,7 +7,7 @@ import { NextFunction } from "express";
 /**
  * Оборачивает в try-catch
  */
-export default function trycatch(): NextFunction {
+export default function trycatch(): NextHandleFunction {
     return async function (request: Request, response: Response, next: NextFunction) {
         try {
             next();
