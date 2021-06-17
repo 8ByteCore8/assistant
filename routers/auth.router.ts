@@ -16,7 +16,7 @@ export default express.Router()
         bodyValidation(Joi.object({
             login: Joi.string().trim().not("").max(50).alphanum().required(),
             password: Joi.string().trim().required(),
-        })),
+        }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
                 const repository = getRepository(User);
@@ -56,7 +56,7 @@ export default express.Router()
 
             role: Joi.string().trim().allow("Students", "Teachers", "Admins").default("Students"),
             group: Joi.number().integer().positive(),
-        })),
+        }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
                 const repository = getRepository(User);
@@ -94,7 +94,7 @@ export default express.Router()
                         where: {
                             "name": role,
                         },
-                        cache: true
+                        cache: true,
                     });
 
                     // Заполнение доп. поля для студентов.
@@ -131,6 +131,33 @@ export default express.Router()
                     return response.status(200).send();
 
                 throw new HttpError("Invalid auth token", 403);
+            } catch (error) {
+                next(error);
+            }
+        }
+    )
+    .post("/edit",
+        bodyValidation(Joi.object({
+            password: Joi.string().trim().min(8).default(null),
+            email: Joi.string().trim().email().default(null),
+        }).required()),
+        async function (request: Request, response: Response, next: NextFunction) {
+            try {
+                const repository = getRepository(User);
+                const { password, email } = request.body;
+                let user = response.locals["user"];
+
+                if (password)
+                    user = await User.setPassword(user, password);
+
+                if (email)
+                    user.email = email;
+
+                if (password || email)
+                    await repository.save(user);
+
+                return response.status(200).send();
+
             } catch (error) {
                 next(error);
             }
