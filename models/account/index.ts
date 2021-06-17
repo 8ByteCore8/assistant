@@ -1,9 +1,9 @@
+import "reflect-metadata";
 import { compare, hash } from "bcryptjs";
-import { Column, createQueryBuilder, JoinTable, ManyToMany, ManyToOne } from "typeorm";
+import { Column, JoinTable, ManyToMany, ManyToOne } from "typeorm";
 import { Model } from "..";
 import { Permission } from "./Permission";
 import { Role } from "./Role";
-import { User } from "./User";
 
 /**
  * Абстаркное представление пользователя необходимое для базового взаимодействия.

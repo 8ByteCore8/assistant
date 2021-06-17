@@ -8,7 +8,9 @@
     "start-server": "ts-node ./index.ts",
     "start-client": "npm run start --prefix client",
     "build": "concurrently npm build-*",
-    "build-client": "npm run build --prefix client"
+    "build-client": "npm run build --prefix client",
+    "create-superuser": "ts-node ./cli/createsuperuser.ts",
+    "db-recreate": "ts-node ./cli/recreate.ts"
   },
   "author": "Kushnir Bogdan, Vladislav Rossikhin",
   "license": "ISC",
@@ -28,6 +30,7 @@
     "express": "^4.17.1",
     "joi": "^17.4.0",
     "jsonwebtoken": "^8.5.1",
+    "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.0.2",
     "typeorm": "^0.2.34"
   }

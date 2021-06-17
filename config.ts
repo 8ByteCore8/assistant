@@ -90,8 +90,7 @@ const config: AppConfig = {
             migrationsDir: join(__dirname, "./migrations"),
             subscribersDir: join(__dirname, "./subscribers"),
         },
-        // synchronize: DEBUG,
-        // dropSchema: DEBUG,
+        migrationsRun: true,
     }
 };
 
