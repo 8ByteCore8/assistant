@@ -51,9 +51,9 @@ export default express.Router()
             name: Joi.string().trim().not("").max(50).alphanum().required(),
             lastname: Joi.string().trim().not("").max(50).alphanum().required(),
             surname: Joi.string().trim().not("").max(50).alphanum().required(),
-            email: Joi.string().trim().email().default(undefined),
+            email: Joi.string().trim().email().default(null),
 
-            role: Joi.string().trim().allow(["Students", "Teachers", "Admins"]).default("Students"),
+            role: Joi.string().trim().allow("Students", "Teachers", "Admins").default("Students"),
             group: Joi.number().integer().positive().required(),
         })),
         async function (request: Request, response: Response, next: NextFunction) {

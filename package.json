@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "start": "concurrently npm start-*",
-    "start-server": "ts-node ./ index.ts",
+    "start-server": "ts-node ./index.ts",
     "start-client": "npm run start --prefix client",
     "build": "concurrently npm build-*",
     "build-client": "npm run build --prefix client"
