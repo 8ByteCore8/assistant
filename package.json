@@ -9,7 +9,7 @@
     "start-client": "npm run start --prefix client",
     "build": "concurrently npm build-*",
     "build-client": "npm run build --prefix client",
-    "create-superuser": "ts-node ./cli/createsuperuser.ts",
+    "db-create-superuser": "ts-node ./cli/createsuperuser.ts",
     "db-init": "ts-node ./cli/init.ts"
   },
   "author": "Kushnir Bogdan, Vladislav Rossikhin",
