@@ -13,7 +13,7 @@ export default function trycatch(): NextHandleFunction {
             next();
         }
         catch (error) {
-            next();
+            next(error);
         }
     };
 };

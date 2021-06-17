@@ -29,7 +29,9 @@ export type PermissionValidator = Object | Array<PermissionValidator> | string |
  * @returns true - Пользователь может выполнить действие, иначе - false.
  */
 export async function validatePermissions(permission: PermissionValidator, user: User, permissions: string[]): Promise<boolean> {
-    if (typeof permission === "string")
+    if (user.superuser)
+        return true;
+    else if (typeof permission === "string")
         return permission in permissions;
     else if (typeof permission === "function")
         return await permission(user, permissions);
@@ -68,7 +70,7 @@ export function permissions(): NextHandleFunction {
                     response.locals["permissions"].push(permission.name);
             }
             else
-                response.locals["permissions"] = undefined;
+                response.locals["permissions"] = null;
 
             next();
         } catch (error) {
@@ -87,13 +89,13 @@ export default function hasPermissions(permission: PermissionValidator): NextHan
             let user = response.locals["user"];
             let permissions = response.locals["permissions"];
 
-            if (permissions) {
+            if (user) {
                 // Суперпользователю можно всё. Зачем на него тратить время?
                 if (user.superuser)
                     return next();
 
                 // Проверка наличия всех необходимых прав
-                if (await validatePermissions(permission, user, response.locals["permissions"]))
+                if (await validatePermissions(permission, user, permissions))
                     return next();
 
             }

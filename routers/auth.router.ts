@@ -9,12 +9,13 @@ import { HttpError, PermissionsDeniedError } from '../errors';
 import hasPermissions, { validatePermissions } from '../middlewares/has-permitions.middleware';
 import { Role } from '../models/account/Role';
 import { Group } from '../models/Group';
+import { randomBytes } from 'crypto';
 
 export default express.Router()
     .post("/",
         bodyValidation(Joi.object({
             login: Joi.string().trim().not("").max(50).alphanum().required(),
-            password: Joi.string().trim().min(8).required(),
+            password: Joi.string().trim().required(),
         })),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
@@ -43,10 +44,9 @@ export default express.Router()
         }
     )
     .post("/register",
-        hasPermissions("register"),
+        hasPermissions("can_register"),
         bodyValidation(Joi.object({
             login: Joi.string().trim().not("").max(50).alphanum().required(),
-            password: Joi.string().trim().min(8).required(),
 
             name: Joi.string().trim().not("").max(50).alphanum().required(),
             lastname: Joi.string().trim().not("").max(50).alphanum().required(),
@@ -54,13 +54,13 @@ export default express.Router()
             email: Joi.string().trim().email().default(null),
 
             role: Joi.string().trim().allow("Students", "Teachers", "Admins").default("Students"),
-            group: Joi.number().integer().positive().required(),
+            group: Joi.number().integer().positive(),
         })),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
                 const repository = getRepository(User);
                 const roleRepository = getRepository(Role);
-                const { login, password, name, lastname, surname, email, role, group } = request.body;
+                const { login, name, lastname, surname, email, role, group } = request.body;
 
                 // Проверка прав для создания учёной записи данного типа.
                 if (!await validatePermissions(`register_${(role as string).toLowerCase()}`, response.locals["user"], response.locals["permissions"]))
@@ -84,7 +84,7 @@ export default express.Router()
                     });
 
                     // Установка пароля.
-                    user = await User.setPassword(user, password);
+                    user = await User.setPassword(user, randomBytes(32).toString("utf-8"));
 
                     // Указание типа учётной записи.
                     user.role = roleRepository.findOneOrFail({
@@ -109,7 +109,10 @@ export default express.Router()
                     user = await repository.save(user);
 
                     // Отправка ответа
-                    return response.status(200);
+                    return response.status(200).json({
+                        "login": user.login,
+                        "password": user.password,
+                    });
                 }
                 else
                     throw new HttpError("User with this login already exists.", 400);
@@ -122,7 +125,8 @@ export default express.Router()
         async function (request: Request, response: Response, next: NextFunction) {
             try {
                 if (response.locals["user"])
-                    return response.status(200);
+                    return response.status(200).send();
+
                 throw new HttpError("Invalid auth token", 403);
             } catch (error) {
                 next(error);

@@ -40,6 +40,7 @@ async function main() {
 
     cli.question("Login (root): ", login => {
         login = login || "root";
+
         cli.question("Password (00000000): ", password => {
             password = password || "00000000";
             CreateSuperUser({

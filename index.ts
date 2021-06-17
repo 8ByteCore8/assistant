@@ -27,7 +27,7 @@ export type Request = ExpressRequest<ParamsDictionary, any, any, ParsedQs, Local
 export type Response = ExpressResponse<any, Locals>;
 
 async function main() {
-    let connection = await createConnection(config.db);
+    await createConnection(config.db);
 
     const app = express();
 
@@ -36,8 +36,6 @@ async function main() {
 
 
     app.listen(config.port, () => console.log("Server started."));
-
-    await connection.close();
 }
 
 

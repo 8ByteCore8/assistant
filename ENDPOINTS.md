@@ -40,7 +40,6 @@
 ```jsonc
 {
     "login": "<login>",
-    "password": "<password>",
 
     "name": "<name>",
     "lastname": "<lastname>",

@@ -42,10 +42,14 @@ export abstract class AbstractUser extends Model {
     public superuser: boolean;
 
     public static async getAllPermissions<T extends AbstractUser>(user: T): Promise<Permission[]> {
-        return [
-            ...await user.permissions,
-            ...await (await user.role).permissions,
-        ];
+
+        let permissions = await user.permissions;
+
+        let role = await user.role;
+        if (role)
+            permissions = permissions.concat(await role.permissions);
+
+        return permissions;
     }
 
     /**

@@ -46,7 +46,7 @@ export default function auth(): NextHandleFunction {
         }
         catch (error) {
             // Если что-то не так, занчит пользователь не авторизован
-            response.locals["user"] = undefined;
+            response.locals["user"] = null;
             return next();
         }
     };

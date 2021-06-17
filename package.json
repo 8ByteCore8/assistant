@@ -10,7 +10,7 @@
     "build": "concurrently npm build-*",
     "build-client": "npm run build --prefix client",
     "create-superuser": "ts-node ./cli/createsuperuser.ts",
-    "db-recreate": "ts-node ./cli/recreate.ts"
+    "db-init": "ts-node ./cli/init.ts"
   },
   "author": "Kushnir Bogdan, Vladislav Rossikhin",
   "license": "ISC",
