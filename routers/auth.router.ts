@@ -117,4 +117,15 @@ export default express.Router()
                 next(error);
             }
         }
+    )
+    .post("/check",
+        async function (request: Request, response: Response, next: NextFunction) {
+            try {
+                if (response.locals["user"])
+                    return response.status(200);
+                throw new HttpError("Invalid auth token", 403);
+            } catch (error) {
+                next(error);
+            }
+        }
     );
