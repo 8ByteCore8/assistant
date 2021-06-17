@@ -47,6 +47,7 @@ export default express.Router()
         hasPermissions("can_register"),
         bodyValidation(Joi.object({
             login: Joi.string().trim().not("").max(50).alphanum().required(),
+            password: Joi.string().trim().min(8).default(null),
 
             name: Joi.string().trim().not("").max(50).alphanum().required(),
             lastname: Joi.string().trim().not("").max(50).alphanum().required(),
@@ -60,7 +61,7 @@ export default express.Router()
             try {
                 const repository = getRepository(User);
                 const roleRepository = getRepository(Role);
-                const { login, name, lastname, surname, email, role, group } = request.body;
+                const { login, password, name, lastname, surname, email, role, group } = request.body;
 
                 // Проверка прав для создания учёной записи данного типа.
                 if (!await validatePermissions(`register_${(role as string).toLowerCase()}`, response.locals["user"], response.locals["permissions"]))
@@ -83,8 +84,10 @@ export default express.Router()
                         "email": email,
                     });
 
+                    const _password = password || randomBytes(32).toString("utf-8");
+
                     // Установка пароля.
-                    user = await User.setPassword(user, randomBytes(32).toString("utf-8"));
+                    user = await User.setPassword(user, _password);
 
                     // Указание типа учётной записи.
                     user.role = roleRepository.findOneOrFail({
@@ -110,8 +113,8 @@ export default express.Router()
 
                     // Отправка ответа
                     return response.status(200).json({
-                        "login": user.login,
-                        "password": user.password,
+                        "login": login,
+                        "password": _password,
                     });
                 }
                 else
