@@ -16,7 +16,7 @@ export default Router()
         async function (request: Request, response: Response, next: NextFunction) {
             try {
                 let user = response.locals["user"];
-                let projects: Project[] = await (await user.group).projects;
+                let projects: Project[] = user.group.projects;
 
                 return response.status(200).json(
                     await Model.toFlat(projects, [
@@ -24,7 +24,7 @@ export default Router()
                         "name",
                         "description",
                     ], {
-                        "tasks": async instance => await Model.toFlat(await instance.tasks, [
+                        "tasks": async instance => await Model.toFlat(instance.tasks, [
                             "id",
                             "name",
                             "description",
@@ -53,7 +53,7 @@ export default Router()
                         "name",
                         "description",
                     ], {
-                        "tasks": async instance => await Model.toFlat(await instance.tasks, [
+                        "tasks": async instance => await Model.toFlat(instance.tasks, [
                             "id",
                             "name",
                             "description",
@@ -118,7 +118,7 @@ export default Router()
                         "name",
                         "description",
                     ], {
-                        "tasks": async instance => await Model.toFlat(await instance.tasks, [
+                        "tasks": async instance => await Model.toFlat(instance.tasks, [
                             "id",
                             "name",
                             "description",
@@ -208,7 +208,7 @@ export default Router()
                         "name",
                         "description",
                     ], {
-                        "tasks": async instance => await Model.toFlat(await instance.tasks, [
+                        "tasks": async instance => await Model.toFlat(instance.tasks, [
                             "id",
                             "name",
                             "description",

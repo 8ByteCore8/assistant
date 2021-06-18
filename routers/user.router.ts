@@ -93,7 +93,7 @@ export default express.Router()
                     user = await User.setPassword(user, _password);
 
                     // Указание типа учётной записи.
-                    user.role = roleRepository.findOneOrFail({
+                    user.role = await roleRepository.findOneOrFail({
                         where: {
                             "name": role,
                         },
@@ -103,7 +103,7 @@ export default express.Router()
                     // Заполнение доп. поля для студентов.
                     if (role === "Students") {
                         const groupRepository = getRepository(Group);
-                        user.group = groupRepository.findOneOrFail({
+                        user.group = await groupRepository.findOneOrFail({
                             where: {
                                 "id": group,
                             },
@@ -148,11 +148,18 @@ export default express.Router()
                         "surname",
                         "email",
                     ], {
-                        "role": async instance => (await instance.role).name,
+                        "role": async instance => {
+                            let role = instance.role;
+
+                            if (role)
+                                return role.name;
+                            else
+                                return null;
+                        },
                         "group": async instance => {
-                            let group = await instance.group;
+                            let group = instance.group;
                             if (group)
-                                return await Model.toFlat(await instance.group, [
+                                return await Model.toFlat(group, [
                                     "id",
                                     "name",
                                 ]);

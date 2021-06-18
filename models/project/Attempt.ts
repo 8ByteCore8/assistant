@@ -16,9 +16,9 @@ export class Attempt extends Model {
     id: number;
 
     @ManyToOne(() => Task)
-    task: Promise<Task>;
+    task: Task;
 
-    user_task:Promise<UserTask>
+    user_task:UserTask
 
     @Column()
     answer: string;

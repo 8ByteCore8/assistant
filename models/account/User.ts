@@ -14,19 +14,19 @@ export class User extends AbstractUser {
 
     @Column({
         length: 50,
-        nullable:true,
+        nullable: true,
     })
     public name: string;
 
     @Column({
         length: 50,
-        nullable:true,
+        nullable: true,
     })
     public lastname: string;
 
     @Column({
         length: 50,
-        nullable:true,
+        nullable: true,
     })
     public surname: string;
 
@@ -37,7 +37,7 @@ export class User extends AbstractUser {
     public email: string;
 
     @ManyToOne(() => Group, group => group.users)
-    public group: Promise<Group>;
+    public group: Group;
 
     // @OneToMany(() => Attempt)
     // attempts: Promise<Attempt[]>;

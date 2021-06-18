@@ -19,8 +19,8 @@ export class Group extends Model {
     public name: string;
 
     @OneToMany(() => User, profile => profile.group)
-    users: Promise<User[]>;
+    users: User[];
 
     @ManyToMany(() => Project, project => project.groups)
-    projects: Promise<Project[]>;
+    projects: Project[];
 }

@@ -24,7 +24,7 @@ export class Task extends Model {
     validator: string;
 
     @ManyToOne(() => Project, project => project.tasks)
-    project: Promise<Project>;
+    project: Project;
 
     // @ManyToMany(() => Task, task => task.dependents)
     // @JoinTable()

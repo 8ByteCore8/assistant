@@ -11,13 +11,13 @@ export class UserTask extends Model {
     @ManyToOne(() => User, {
         primary: true
     })
-    task: Promise<Task>;
+    task: Task;
 
     @ManyToOne(() => User, {
         primary: true
     })
-    user: Promise<User>;
+    user: User;
 
     @OneToMany(() => Attempt, attempt => attempt.task)
-    attempts: Promise<Attempt[]>;
+    attempts: Attempt[];
 }

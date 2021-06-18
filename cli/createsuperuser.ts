@@ -4,6 +4,7 @@ import { createConnection, DeepPartial, getRepository } from "typeorm";
 import { cli } from ".";
 import config from "../config";
 import { User } from "../models/account/User";
+import { Role } from "../models/account/Role";
 
 
 const schema = Joi.object({
@@ -23,10 +24,18 @@ async function CreateSuperUser(user_data: DeepPartial<User>) {
     });
 
     const repository = getRepository(User);
+    const roleRepository = getRepository(Role);
 
     let user = repository.create(user_data);
     user.active = true;
     user.superuser = true;
+    
+    user.role = await roleRepository.findOneOrFail({
+        where: {
+            "name": "Admins"
+        }
+    });
+    
     user = await User.setPassword(user, user_data["password"]);
     user = await repository.save(user);
 

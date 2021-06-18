@@ -19,12 +19,12 @@ export class Project extends Model {
     @Column({
         length: 2000,
     })
-    description:string
+    description: string;
 
     @ManyToMany(() => Group, group => group.projects)
     @JoinTable()
-    groups: Promise<Group[]>;
+    groups: Group[];
 
-    @OneToMany(()=>Task,task=>task.project)
-    tasks: Promise<Task[]>;
+    @OneToMany(() => Task, task => task.project)
+    tasks: Task[];
 }
