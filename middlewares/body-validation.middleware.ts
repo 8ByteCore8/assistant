@@ -8,7 +8,7 @@ import { NextFunction } from "express";
  * @param schema Схема тела запроса
  * @param options Опции валидации
  */
-export default function bodyValidation(schema: ObjectSchema, options?: AsyncValidationOptions): NextHandleFunction {
+export function bodyValidation(schema: ObjectSchema, options?: AsyncValidationOptions): NextHandleFunction {
     return async function (request: Request, response: Response, next: NextFunction) {
         try {
             // Валидация и очитска request.body
@@ -18,10 +18,10 @@ export default function bodyValidation(schema: ObjectSchema, options?: AsyncVali
                 ...options,
             });
 
-            next();
+            return next();
         }
         catch (error) {
-            next(error);
+            return next(error);
         }
     };
 }

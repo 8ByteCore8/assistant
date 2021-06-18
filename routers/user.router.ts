@@ -2,17 +2,17 @@ import express, { NextFunction } from 'express';
 import Joi from 'joi';
 import { getRepository } from 'typeorm';
 import { Request, Response } from '..';
-import bodyValidation from '../middlewares/body-validation.middleware';
-import { getToken } from '../middlewares/auth.middleware';
+import { bodyValidation } from '../middlewares/body-validation.middleware';
+import { getToken, loginRequired } from '../middlewares/auth.middleware';
 import { User } from '../models/account/User';
 import { HttpError, PermissionsDeniedError } from '../errors';
-import hasPermissions, { validatePermissions } from '../middlewares/has-permitions.middleware';
+import { hasPermissions, validatePermissions } from '../middlewares/has-permitions.middleware';
 import { Role } from '../models/account/Role';
 import { Group } from '../models/Group';
 import { randomBytes } from 'crypto';
 
 export default express.Router()
-    .post("/",
+    .post("/login",
         bodyValidation(Joi.object({
             login: Joi.string().trim().not("").max(50).alphanum().required(),
             password: Joi.string().trim().required(),
@@ -39,11 +39,12 @@ export default express.Router()
                 }
                 throw new HttpError("Invalid login data.", 403);
             } catch (error) {
-                next(error);
+                return  next(error);
             }
         }
     )
     .post("/register",
+        loginRequired(),
         hasPermissions("can_register"),
         bodyValidation(Joi.object({
             login: Joi.string().trim().not("").max(50).alphanum().required(),
@@ -120,23 +121,39 @@ export default express.Router()
                 else
                     throw new HttpError("User with this login already exists.", 400);
             } catch (error) {
-                next(error);
+                return   next(error);
             }
         }
     )
-    .post("/check",
+    .head("/",
+        loginRequired(),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                if (response.locals["user"])
-                    return response.status(200).send();
-
-                throw new HttpError("Invalid auth token", 403);
+                return response.status(200).send();
             } catch (error) {
-                next(error);
+                return next(error);
             }
         }
     )
-    .post("/edit",
+    .get("/",
+        loginRequired(),
+        async function (request: Request, response: Response, next: NextFunction) {
+            try {
+                return response.status(200).json(
+                    await User.toFlat(response.locals["user"], [
+                        "name",
+                        "lastname",
+                        "surname",
+                        "email",
+                    ])
+                );
+            } catch (error) {
+                return   next(error);
+            }
+        }
+    )
+    .put("/",
+        loginRequired(),
         bodyValidation(Joi.object({
             password: Joi.string().trim().min(8).default(null),
             email: Joi.string().trim().email().default(null),
@@ -159,7 +176,7 @@ export default express.Router()
                 return response.status(200).send();
 
             } catch (error) {
-                next(error);
+               return  next(error);
             }
         }
     );

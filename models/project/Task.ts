@@ -1,7 +1,5 @@
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Model } from "..";
-// import { Validators } from "../../validators";
-import { Attempt } from "./Attempt";
 import { Project } from "./Project";
 
 @Entity()
@@ -15,20 +13,23 @@ export class Task extends Model {
     name: string;
 
     @Column({
-        nullable: true
+        length: 2000,
+    })
+    description:string
+
+    @Column({
+        nullable: true,
+        length:50,
     })
     validator: string;
-
-    @ManyToOne(() => Attempt, attempt => attempt.task)
-    attempts: Promise<Attempt[]>;
 
     @ManyToOne(() => Project, project => project.tasks)
     project: Promise<Project>;
 
-    @ManyToMany(() => Task, task => task.dependents)
-    @JoinTable()
-    depends: Promise<Task[]>;
+    // @ManyToMany(() => Task, task => task.dependents)
+    // @JoinTable()
+    // depends: Promise<Task[]>;
 
-    @ManyToMany(() => Task, task => task.depends)
-    dependents: Promise<Task[]>;
+    // @ManyToMany(() => Task, task => task.depends)
+    // dependents: Promise<Task[]>;
 }

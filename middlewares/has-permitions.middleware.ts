@@ -72,9 +72,9 @@ export function permissions(): NextHandleFunction {
             else
                 response.locals["permissions"] = null;
 
-            next();
+            return next();
         } catch (error) {
-            next(error);
+            return next(error);
         }
     };
 };
@@ -83,7 +83,7 @@ export function permissions(): NextHandleFunction {
  * Проверяет права доступа пользователя.
  * @param permissions Список необходимых разрешений.
  */
-export default function hasPermissions(permission: PermissionValidator): NextHandleFunction {
+export function hasPermissions(permission: PermissionValidator): NextHandleFunction {
     return async function (request: Request, response: Response, next: NextFunction) {
         try {
             let user = response.locals["user"];
@@ -102,6 +102,7 @@ export default function hasPermissions(permission: PermissionValidator): NextHan
             throw new PermissionsDeniedError();
         }
         catch (error) {
+            return next(error);
         }
     };
 }

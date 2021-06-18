@@ -13,9 +13,13 @@ export class Project extends Model {
 
     @Column({
         length: 100,
-        unique: true,
     })
     name: string;
+
+    @Column({
+        length: 2000,
+    })
+    description:string
 
     @ManyToMany(() => Group, group => group.projects)
     @JoinTable()

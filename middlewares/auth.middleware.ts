@@ -6,6 +6,7 @@ import { User } from "../models/account/User";
 import { NextHandleFunction } from 'connect';
 import { getRepository } from "typeorm";
 import { NextFunction } from "express";
+import { PermissionsDeniedError } from "../errors";
 
 /**
  * AUTH HEADER FORMAT
@@ -22,7 +23,7 @@ export type UserAuthData = {
 /**
  * Авторизирует пользователя по токену.
  */
-export default function auth(): NextHandleFunction {
+export function auth(): NextHandleFunction {
     return async function (request: Request, response: Response, next: NextFunction) {
         try {
             const repository = getRepository(User);
@@ -48,6 +49,22 @@ export default function auth(): NextHandleFunction {
             // Если что-то не так, занчит пользователь не авторизован
             response.locals["user"] = null;
             return next();
+        }
+    };
+}
+
+/**
+ * Проверяет авторизацию пользоватля.
+ */
+export function loginRequired(): NextHandleFunction {
+    return async function (request: Request, response: Response, next: NextFunction) {
+        try {
+            if (!response.locals["user"])
+                throw new PermissionsDeniedError();
+            return next();
+        }
+        catch (error) {
+            return next(error);
         }
     };
 }
