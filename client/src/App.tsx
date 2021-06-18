@@ -28,7 +28,7 @@ const App = () => {
                             dispatch(setAuthorizationStatus("authorized"));
                         } else {
                             dispatch(setAuthorizationStatus("notAuthorized"));
-                            //removeCookie("session");
+                            removeCookie("session");
                         }
                     },
                     (error) => {
@@ -46,7 +46,7 @@ const App = () => {
             return (
                 <>
                     <Header/>
-                    <div className="main container">
+                    <div className="mainWrapper container">
                         <Switch>
                             <Route path='/' exact component={HomePage}/>
                             <Route component={NotFoundPage}/>

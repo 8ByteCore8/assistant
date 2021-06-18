@@ -1,0 +1,24 @@
+.headerWrapper{
+    position: fixed;
+    top: 0;
+    width: 100%;
+    align-items: center;
+    border-bottom: 1px solid #c1c1c1;
+}
+
+.logoText{
+    font-weight: bolder;
+    color: #000 !important;
+    text-decoration: none !important;
+}
+
+.headerContent{
+    height: 55px;
+    display: flex;
+    align-items: center;
+}
+
+.headerExit .btn{
+    color: #fff;
+    background-color: #474747;
+}
