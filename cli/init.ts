@@ -46,7 +46,7 @@ async function main() {
                 permissions[1],
                 permissions[3],
                 permissions[4],
-            ] as any
+            ]
         }, {
             "name": "Admins",
             "permissions": [
@@ -55,7 +55,7 @@ async function main() {
                 permissions[2],
                 permissions[3],
                 permissions[4],
-            ] as any
+            ]
         }
     ]));
 

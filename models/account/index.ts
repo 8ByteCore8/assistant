@@ -47,7 +47,7 @@ export abstract class AbstractUser extends Model {
 
         let role = user.role;
         if (role)
-            permissions = permissions.concat(await role.permissions);
+            permissions = permissions.concat(role.permissions);
 
         return permissions;
     }
