@@ -39,6 +39,6 @@ export class User extends AbstractUser {
     @ManyToOne(() => Group, group => group.users)
     public group: Promise<Group>;
 
-    @OneToMany(() => Attempt, attempt => attempt.user)
-    attempts: Promise<Attempt[]>;
+    // @OneToMany(() => Attempt)
+    // attempts: Promise<Attempt[]>;
 }
