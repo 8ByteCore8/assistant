@@ -10,6 +10,8 @@ import { hasPermissions, validatePermissions } from '../middlewares/has-permitio
 import { Role } from '../models/account/Role';
 import { Group } from '../models/Group';
 import { randomBytes } from 'crypto';
+import { Model } from '../models';
+import { group } from 'console';
 
 export default express.Router()
     .post("/login",
@@ -39,7 +41,7 @@ export default express.Router()
                 }
                 throw new HttpError("Invalid login data.", 403);
             } catch (error) {
-                return  next(error);
+                return next(error);
             }
         }
     )
@@ -121,7 +123,7 @@ export default express.Router()
                 else
                     throw new HttpError("User with this login already exists.", 400);
             } catch (error) {
-                return   next(error);
+                return next(error);
             }
         }
     )
@@ -145,10 +147,22 @@ export default express.Router()
                         "lastname",
                         "surname",
                         "email",
-                    ])
+                    ], {
+                        "role": async instance => (await instance.role).name,
+                        "group": async instance => {
+                            let group = await instance.group;
+                            if (group)
+                                return await Model.toFlat(await instance.group, [
+                                    "id",
+                                    "name",
+                                ]);
+                            else
+                                return null;
+                        },
+                    })
                 );
             } catch (error) {
-                return   next(error);
+                return next(error);
             }
         }
     )
@@ -176,7 +190,7 @@ export default express.Router()
                 return response.status(200).send();
 
             } catch (error) {
-               return  next(error);
+                return next(error);
             }
         }
     );

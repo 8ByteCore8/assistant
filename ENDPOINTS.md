@@ -112,6 +112,11 @@ Note: Если токен актуальный возвращает ответ �
     "name": "string[50]",
     "lastname": "string[50]",
     "surname": "string[50]",
+    "role:":"role",
+    "group?":{
+        "id":"id",
+        "name":"string[50]",
+    },
     "email": "email",
 }
 ```

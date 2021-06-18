@@ -3,8 +3,9 @@ import { Validator } from ".";
 
 type Input = {
 
-}
+};
 
 export default class ViewValidator extends Validator<Input>{
-    inputSchema = Joi.Va
+    protected validator: () => Promise<boolean>;
+    inputSchema = Joi.object();
 }
