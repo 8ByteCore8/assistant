@@ -11,7 +11,6 @@ import { Role } from '../models/account/Role';
 import { Group } from '../models/Group';
 import { randomBytes } from 'crypto';
 import { Model } from '../models';
-import { group } from 'console';
 
 export default express.Router()
     .post("/login",

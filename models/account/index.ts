@@ -29,10 +29,13 @@ export abstract class AbstractUser extends Model {
 
     @ManyToOne(() => Role, role => role.users, {
         nullable: true,
+        eager: true
     })
     public role: Role;
 
-    @ManyToMany(() => Permission)
+    @ManyToMany(() => Permission, {
+        eager: true
+    })
     @JoinTable()
     public permissions: Permission[];
 
