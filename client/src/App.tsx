@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {Route, Switch} from "react-router-dom";
 import {useCookies} from 'react-cookie';
 import LoginPage from "./pages/Login";
@@ -6,14 +6,13 @@ import HomePage from "./pages/Home";
 import NotFoundPage from "./pages/NotFound";
 import Header from "./components/header";
 import Footer from "./components/footer";
-// import {useDispatch, useSelector} from "react-redux";
-// import {setCount} from "./reducers/reposReducer";
+import {useDispatch, useSelector} from "react-redux";
+import {setAuthorizationStatus} from "./reducers/userReducer";
 
 const App = () => {
-    // const dispatch = useDispatch();
-    // const count = useSelector((state: any) => state.repos.count);
+    const dispatch = useDispatch();
 
-    const [authorizationStatus, setAuthorizationStatus] = useState("needConfirmation");
+    const authorizationStatus = useSelector((state: any) => state.user.authorizationStatus);
     const [cookies, setCookie, removeCookie] = useCookies(['session']);
 
     useEffect(() => {
@@ -26,9 +25,9 @@ const App = () => {
             })
                 .then((result) => {
                         if (result.ok) {
-                            setAuthorizationStatus("authorized");
+                            dispatch(setAuthorizationStatus("authorized"));
                         } else {
-                            setAuthorizationStatus("notAuthorized");
+                            dispatch(setAuthorizationStatus("notAuthorized"));
                             //removeCookie("session");
                         }
                     },
@@ -36,7 +35,7 @@ const App = () => {
                         console.log(error);
                     })
         } else {
-            setAuthorizationStatus("notAuthorized");
+            dispatch(setAuthorizationStatus("notAuthorized"));
         }
     }, []);
 
@@ -47,12 +46,12 @@ const App = () => {
             return (
                 <>
                     <Header/>
-                    {/*{count}*/}
-                    {/*<button onClick={() => dispatch(setCount(count + 1))}>TEXT</button>*/}
-                    <Switch>
-                        <Route path='/' exact component={HomePage}/>
-                        <Route component={NotFoundPage} />
-                    </Switch>
+                    <div className="main container">
+                        <Switch>
+                            <Route path='/' exact component={HomePage}/>
+                            <Route component={NotFoundPage}/>
+                        </Switch>
+                    </div>
                     <Footer/>
                 </>
             )
