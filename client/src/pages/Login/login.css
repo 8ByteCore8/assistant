@@ -1,0 +1,44 @@
+.loginFormWrapper{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fbfbfb;
+}
+
+.loginForm{
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    width: 100%;
+    max-width: 350px;
+}
+
+.loginFormHeader{
+    background-color: #F5F5F5;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    padding: 10px 15px;
+    font-weight: bolder;
+    border-bottom: 1px solid #d0d0d0;
+}
+
+.loginFormContent{
+    display: flex;
+    flex-direction: column;
+    padding: 20px 40px;
+    background-color: #fff;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.loginFormContent input{
+    margin-bottom: 15px;
+}
+
+.loginFormErrorRow{
+    background-color: #ffc5c5;
+    border-bottom: 1px solid #ff9494;
+    padding: 10px 15px;
+}
