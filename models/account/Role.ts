@@ -19,11 +19,10 @@ export class Role extends Model {
     public name: string;
 
     @ManyToMany(() => Permission,{
-        eager:true
     })
     @JoinTable()
-    public permissions: Permission[];
+    public permissions: Promise<Permission[]>;
 
     @OneToMany(() => User, user => user.role)
-    public users: User[];
+    public users: Promise<User[]>;
 }

@@ -6,6 +6,7 @@
   "scripts": {
     "start": "concurrently \"npm run start-*\"",
     "start-server": "ts-node ./index.ts",
+    "start-dev-server": "npm run db-init && npm run db-create-superuser && npm run start-server",
     "start-client": "npm run start --prefix client",
     "build": "concurrently npm run build-*",
     "build-client": "npm run build --prefix client",

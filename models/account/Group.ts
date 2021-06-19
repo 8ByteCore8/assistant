@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Model } from ".";
-import { User } from "./account/User";
-import { Project } from "./project/Project";
+import { Model } from "..";
+import { User } from "./User";
+import { Project } from "../project/Project";
 
 /**
  * Группы студентов.
@@ -19,8 +19,8 @@ export class Group extends Model {
     public name: string;
 
     @OneToMany(() => User, profile => profile.group)
-    users: User[];
+    users: Promise<User[]>;
 
     @ManyToMany(() => Project, project => project.groups)
-    projects: Project[];
+    projects: Promise<Project[]>;
 }

@@ -26,8 +26,6 @@ export type UserAuthData = {
 export function auth(): NextHandleFunction {
     return async function (request: Request, response: Response, next: NextFunction) {
         try {
-            const repository = getRepository(User);
-
             // Изьятие токена
             let [, token] = request.header("authorization").split(" ", 2);
 
@@ -35,7 +33,7 @@ export function auth(): NextHandleFunction {
             const { id } = verify(token, configs.secret) as UserAuthData;
 
             // Поиск авторизованого пользователя
-            response.locals["user"] = await repository.findOneOrFail({
+            response.locals["user"] = await User.findOneOrFail({
                 where: {
                     "id": id,
                     "active": true

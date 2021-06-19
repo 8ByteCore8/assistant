@@ -1,12 +1,12 @@
 import { NextFunction, Router } from "express";
-import Joi, { preferences } from "joi";
-import { DeepPartial, getRepository, In } from "typeorm";
+import Joi from "joi";
+import { DeepPartial, In } from "typeorm";
 import { Request, Response } from "..";
 import { loginRequired } from "../middlewares/auth.middleware";
 import { bodyValidation } from "../middlewares/body-validation.middleware";
 import { hasPermissions } from "../middlewares/has-permitions.middleware";
 import { Model } from "../models";
-import { Group } from "../models/Group";
+import { Group } from "../models/account/Group";
 import { Project } from "../models/project/Project";
 import { Task } from "../models/project/Task";
 
@@ -16,15 +16,15 @@ export default Router()
         async function (request: Request, response: Response, next: NextFunction) {
             try {
                 let user = response.locals["user"];
-                let projects: Project[] = user.group.projects;
+                let projects: Project[] = await (await user.group).projects;
 
                 return response.status(200).json(
-                    await Model.toFlat(projects, [
+                    await Project.toFlat(projects, [
                         "id",
                         "name",
                         "description",
                     ], {
-                        "tasks": async instance => await Model.toFlat(instance.tasks, [
+                        "tasks": async instance => await Task.toFlat(await instance.tasks, [
                             "id",
                             "name",
                             "description",
@@ -39,21 +39,20 @@ export default Router()
     .get("/:id",
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                const repository = getRepository(Project);
                 const { id } = request.params;
-                let project: Project = await repository.findOne({
+                let project: Project = await Project.findOne({
                     where: {
                         "id": id
                     }
                 });
 
                 return response.status(200).json(
-                    await Model.toFlat(project, [
+                    await Project.toFlat(project, [
                         "id",
                         "name",
                         "description",
                     ], {
-                        "tasks": async instance => await Model.toFlat(instance.tasks, [
+                        "tasks": async instance => await Task.toFlat(await instance.tasks, [
                             "id",
                             "name",
                             "description",
@@ -69,13 +68,13 @@ export default Router()
         loginRequired(),
         hasPermissions("can_create_project"),
         bodyValidation(Joi.object({
-            name: Joi.string().trim().not("").max(100).alphanum().required(),
-            description: Joi.string().trim().not("").max(2000).alphanum().required(),
+            name: Joi.string().trim().max(100).required(),
+            description: Joi.string().trim().max(2000).required(),
             tasks: Joi.array().items(
                 Joi.object({
-                    name: Joi.string().trim().not("").max(100).alphanum().required(),
-                    description: Joi.string().trim().not("").max(2000).alphanum().required(),
-                    validator: Joi.string().trim().not("").max(50).alphanum().default(null),
+                    name: Joi.string().trim().max(100).required(),
+                    description: Joi.string().trim().max(2000).required(),
+                    validator: Joi.string().trim().max(50).default(null),
                 }).required()
             ).min(1).required(),
             groups: Joi.array().items(
@@ -84,13 +83,9 @@ export default Router()
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                const repository = getRepository(Project);
-                const groupRepository = getRepository(Group);
-                const taskRepository = getRepository(Task);
-
                 const { name, description, tasks, groups } = request.body;
 
-                let _tasks = await taskRepository.save(taskRepository.create(tasks.map((task: DeepPartial<Task>) => {
+                let _tasks = await Task.save(Task.create(tasks.map((task: DeepPartial<Task>) => {
                     return {
                         "name": task.name,
                         "description": task.description,
@@ -98,17 +93,17 @@ export default Router()
                     };
                 })));
 
-                let _groups = await groupRepository.find({
+                let _groups = await Group.find({
                     where: {
                         "id": In(groups)
                     }
                 });
 
-                let project = await repository.save(repository.create({
+                let project = await Project.save(Project.create({
                     "name": name,
                     "description": description,
-                    "groups": (_groups) as any,
-                    "tasks": (_tasks) as any
+                    "groups": <any>_groups,
+                    "tasks": <any>_tasks
                 }));
 
 
@@ -118,11 +113,15 @@ export default Router()
                         "name",
                         "description",
                     ], {
-                        "tasks": async instance => await Model.toFlat(instance.tasks, [
+                        tasks: async instance => await Task.toFlat(await instance.tasks, [
                             "id",
                             "name",
                             "description",
                             "validator",
+                        ]),
+                        groups: async instance => await Group.toFlat(await instance.groups, [
+                            "id",
+                            "name"
                         ])
                     })
                 );
@@ -133,17 +132,17 @@ export default Router()
     )
     .put("/",
         loginRequired(),
-        hasPermissions("can_edit_project"),
+        hasPermissions("can_create_project"),
         bodyValidation(Joi.object({
             id: Joi.number().integer().positive().required(),
-            name: Joi.string().trim().not("").max(100).alphanum().required(),
-            description: Joi.string().trim().not("").max(2000).alphanum().required(),
+            name: Joi.string().trim().max(100).required(),
+            description: Joi.string().trim().max(2000).required(),
             tasks: Joi.array().items(
                 Joi.object({
                     id: Joi.number().integer().positive().default(null),
-                    name: Joi.string().trim().not("").max(100).alphanum().required(),
-                    description: Joi.string().trim().not("").max(2000).alphanum().required(),
-                    validator: Joi.string().trim().not("").max(50).alphanum().default(null),
+                    name: Joi.string().trim().max(100).required(),
+                    description: Joi.string().trim().max(2000).required(),
+                    validator: Joi.string().trim().max(50).default(null),
                 }).required()
             ).min(1).required(),
             groups: Joi.array().items(
@@ -152,67 +151,51 @@ export default Router()
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                const repository = getRepository(Project);
-                const groupRepository = getRepository(Group);
-                const taskRepository = getRepository(Task);
-
                 const { id, name, description, tasks, groups } = request.body;
 
-                let _groups = await groupRepository.find({
+                let _groups: Group[] = await Group.find({
                     where: {
                         "id": In(groups)
                     }
                 });
 
-                let task_sources = taskRepository.create(tasks.map((task: DeepPartial<Task>) => {
-                    if (task.id)
-                        return {
-                            "id": task.id,
-                            "name": task.name,
-                            "description": task.description,
-                            "validator": task.validator,
-                        };
-                    else
-                        return {
-                            "name": task.name,
-                            "description": task.description,
-                            "validator": task.validator,
-                        };
-                }));
-
-                let _tasks: Task[] = [];
 
                 // TODO: Проверить работает ли это вообще.
-                for (const task of task_sources) {
+                let _tasks: Task[] = [];
+                for (const task of Task.create(tasks)) {
                     _tasks.push(
-                        taskRepository.hasId(task)
-                            ? await taskRepository.preload(task)
+                        Task.hasId(task)
+                            ? await Task.preload(task)
                             : task
                     );
                 }
 
-                let project = await repository.preload({
+                let project: Project = await Project.preload({
                     "id": id,
                     "name": name,
                     "description": description,
-                    "groups": (_groups) as any,
-                    "tasks": (_tasks) as any
+                    "groups": <any>_groups,
+                    "tasks": <any>_tasks
                 });
 
-                project = await repository.save(project);
+                project = await project.save();
 
 
                 return response.status(200).json(
-                    await Model.toFlat(project, [
+                    await Project.toFlat(project, [
                         "id",
                         "name",
                         "description",
                     ], {
-                        "tasks": async instance => await Model.toFlat(instance.tasks, [
+                        "tasks": async instance => await Task.toFlat(await instance.tasks, [
                             "id",
                             "name",
                             "description",
                             "validator",
+                        ]),
+                        groups: async instance => await Group.toFlat(await instance.groups, [
+                            "id",
+                            "name"
                         ])
                     })
                 );

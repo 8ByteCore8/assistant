@@ -8,12 +8,12 @@ import { Role } from "../models/account/Role";
 
 
 const schema = Joi.object({
-    login: Joi.string().trim().not("").max(50).alphanum().required(),
+    login: Joi.string().trim().max(50).alphanum().required(),
     password: Joi.string().trim().min(8).required(),
 
-    name: Joi.string().trim().not("").max(50).alphanum().default(null),
-    lastname: Joi.string().trim().not("").max(50).alphanum().default(null),
-    surname: Joi.string().trim().not("").max(50).alphanum().default(null),
+    name: Joi.string().trim().max(50).alphanum().default(null),
+    lastname: Joi.string().trim().max(50).alphanum().default(null),
+    surname: Joi.string().trim().max(50).alphanum().default(null),
     email: Joi.string().trim().email().default(null),
 }).required();
 
@@ -29,13 +29,13 @@ async function CreateSuperUser(user_data: DeepPartial<User>) {
     let user = repository.create(user_data);
     user.active = true;
     user.superuser = true;
-    
-    user.role = await roleRepository.findOneOrFail({
+
+    user.role = <any>await roleRepository.findOneOrFail({
         where: {
             "name": "Admins"
         }
     });
-    
+
     user = await User.setPassword(user, user_data["password"]);
     user = await repository.save(user);
 

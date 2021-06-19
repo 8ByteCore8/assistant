@@ -29,15 +29,13 @@ export abstract class AbstractUser extends Model {
 
     @ManyToOne(() => Role, role => role.users, {
         nullable: true,
-        eager: true
     })
-    public role: Role;
+    public role: Promise<Role>;
 
     @ManyToMany(() => Permission, {
-        eager: true
     })
     @JoinTable()
-    public permissions: Permission[];
+    public permissions: Promise<Permission[]>;
 
     @Column({
         default: false,
@@ -46,11 +44,11 @@ export abstract class AbstractUser extends Model {
 
     public static async getAllPermissions<T extends AbstractUser>(user: T): Promise<Permission[]> {
 
-        let permissions = user.permissions;
+        let permissions = await user.permissions;
 
-        let role = user.role;
+        let role = await user.role;
         if (role)
-            permissions = permissions.concat(role.permissions);
+            permissions = permissions.concat(await role.permissions);
 
         return permissions;
     }

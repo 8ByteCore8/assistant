@@ -1,7 +1,6 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { AbstractUser } from ".";
-import { Group } from "../Group";
-import { Attempt } from "../project/Attempt";
+import { Group } from "./Group";
 
 /**
  * Учётные записи пользователей.
@@ -36,9 +35,7 @@ export class User extends AbstractUser {
     })
     public email: string;
 
-    @ManyToOne(() => Group, group => group.users)
-    public group: Group;
-
-    // @OneToMany(() => Attempt)
-    // attempts: Promise<Attempt[]>;
+    @ManyToOne(() => Group, group => group.users, {
+    })
+    public group: Promise<Group>;
 }

@@ -1,11 +1,11 @@
-import { DeepPartial, ObjectType } from "typeorm";
+import { BaseEntity, ObjectType } from "typeorm";
 import { getClassName } from "../utils";
 
 export type Relations<T> = {
     [P in keyof T]?: (instance: T) => Promise<any | any[]>
 };
 
-export abstract class Model {
+export abstract class Model  extends BaseEntity{
     /**
      * Возвращает имя красса модели на основе типа или екземпляра.
      * @param model Екземпляр или тип модели.

@@ -29,10 +29,11 @@ export type PermissionValidator = Object | Array<PermissionValidator> | string |
  * @returns true - Пользователь может выполнить действие, иначе - false.
  */
 export async function validatePermissions(permission: PermissionValidator, user: User, permissions: string[]): Promise<boolean> {
-    if (user.superuser)
+    if (user.superuser === true)
         return true;
-    else if (typeof permission === "string")
-        return permission in permissions;
+    else if (typeof permission === "string") {
+        return permissions.includes(permission);
+    }
     else if (typeof permission === "function")
         return await permission(user, permissions);
     else if (typeof permission === "object") {

@@ -1,0 +1,402 @@
+{
+	"info": {
+		"_postman_id": "5ea003f4-5ae8-40d9-b07a-7da51a07141c",
+		"name": "Assistant",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login as Root",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Has auth token\", function () {",
+							"    var data = pm.response.json();",
+							"    pm.collectionVariables.set(\"root_token\", data.token)",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"login\": \"root\",\n    \"password\": \"00000000\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/api/users/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"users",
+						"login"
+					],
+					"query": [
+						{
+							"key": "login",
+							"value": "root",
+							"disabled": true
+						},
+						{
+							"key": "password",
+							"value": "00000000",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register Teacher",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"\", () => {",
+							"    var data = pm.response.json()",
+							"    pm.collectionVariables.set(\"teacher_login\", data.login)",
+							"    pm.collectionVariables.set(\"teacher_password\", data.password)",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{root_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"login\": \"vasia_pupkin\",\n    \"name\": \"Вадим\",\n    \"surname\": \"Вырвиглаз\",\n    \"lastname\": \"Димакович\",\n    \"role\": \"Teachers\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/api/users/register",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"users",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login as Teacher",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Has auth token\", function () {",
+							"    var data = pm.response.json();",
+							"    pm.collectionVariables.set(\"teacher_token\", data.token)",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"login\": \"{{teacher_login}}\",\n    \"password\": \"{{teacher_password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/api/users/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"users",
+						"login"
+					],
+					"query": [
+						{
+							"key": "login",
+							"value": "root",
+							"disabled": true
+						},
+						{
+							"key": "password",
+							"value": "00000000",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Group",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"\", function () {",
+							"    var data = pm.response.json();",
+							"    pm.collectionVariables.set(\"group_1_id\", data.id)",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Baerer {{teacher_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Group 1\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/api/groups",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"groups"
+					],
+					"query": [
+						{
+							"key": "login",
+							"value": "root",
+							"disabled": true
+						},
+						{
+							"key": "password",
+							"value": "00000000",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register Student",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"\", () => {",
+							"    var data = pm.response.json()",
+							"    pm.collectionVariables.set(\"student_login\", data.login)",
+							"    pm.collectionVariables.set(\"student_password\", data.password)",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{teacher_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"login\": \"12342\",\n    \"name\": \"Незнаю\",\n    \"surname\": \"Насралвсундук\",\n    \"lastname\": \"Фотикович\",\n    \"role\": \"Students\",\n    \"group\":\"{{group_1_id}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/api/users/register",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"users",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login as Student",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Has auth token\", function () {",
+							"    var data = pm.response.json();",
+							"    pm.collectionVariables.set(\"student_token\", data.token)",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"login\": \"{{student_login}}\",\n    \"password\": \"{{student_password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/api/users/login",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"users",
+						"login"
+					],
+					"query": [
+						{
+							"key": "login",
+							"value": "root",
+							"disabled": true
+						},
+						{
+							"key": "password",
+							"value": "00000000",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer"
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"pm.test(\"Status code is 2XX\", function () {",
+					"    pm.response.to.be.success;",
+					"});",
+					"",
+					"pm.test(\"Response time is less than 200ms\", function () {",
+					"    pm.expect(pm.response.responseTime).to.be.below(200);",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": "",
+			"disabled": true
+		},
+		{
+			"key": "root_token",
+			"value": ""
+		},
+		{
+			"key": "teacher_token",
+			"value": ""
+		},
+		{
+			"key": "teacher_login",
+			"value": ""
+		},
+		{
+			"key": "teacher_password",
+			"value": ""
+		},
+		{
+			"key": "student_token",
+			"value": ""
+		},
+		{
+			"key": "student_login",
+			"value": ""
+		},
+		{
+			"key": "student_password",
+			"value": ""
+		},
+		{
+			"key": "group_1_id",
+			"value": ""
+		}
+	]
+}

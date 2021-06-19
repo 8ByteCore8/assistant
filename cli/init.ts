@@ -27,7 +27,7 @@ async function main() {
         }, {
             "name": "can_create_project"
         }, {
-            "name": "can_edit_project"
+            "name": "can_create_group"
         }
     ]));
 
@@ -41,7 +41,7 @@ async function main() {
             "name": "Students",
         }, {
             "name": "Teachers",
-            "permissions": [
+            "permissions":<any> [
                 permissions[0],
                 permissions[1],
                 permissions[3],
@@ -49,7 +49,7 @@ async function main() {
             ]
         }, {
             "name": "Admins",
-            "permissions": [
+            "permissions": <any>[
                 permissions[0],
                 permissions[1],
                 permissions[2],

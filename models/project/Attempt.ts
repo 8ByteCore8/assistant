@@ -2,7 +2,6 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Model } from "..";
 import { User } from "../account/User";
 import { Task } from "./Task";
-import { UserTask } from "./UserTask";
 
 export enum AttemptStates {
     PendingAutomaticChecking,
@@ -16,12 +15,20 @@ export class Attempt extends Model {
     id: number;
 
     @ManyToOne(() => Task)
-    task: Task;
+    task: Promise<Task>;
 
-    user_task:UserTask
+    @ManyToOne(() => User)
+    user: Promise<User>;
 
-    @Column()
-    answer: string;
+    @Column({
+        length: 2000,
+    })
+    data: string;
+
+    @Column({
+        nullable: true
+    })
+    is_correct: boolean;
 
     @Column()
     state: AttemptStates;

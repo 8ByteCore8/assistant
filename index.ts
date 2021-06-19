@@ -1,4 +1,4 @@
-import { createConnection } from "typeorm";
+import { createConnection, getManager } from "typeorm";
 import express, { Request as ExpressRequest, Response as ExpressResponse } from "express";
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
@@ -31,12 +31,10 @@ async function main() {
 
     const app = express();
 
-
     app.use("/api", apiRouter);
 
 
     app.listen(config.port, () => console.log("Server started."));
 }
-
 
 main();

@@ -1,6 +1,5 @@
 import express, { NextFunction } from 'express';
 import Joi from 'joi';
-import { getRepository } from 'typeorm';
 import { Request, Response } from '..';
 import { bodyValidation } from '../middlewares/body-validation.middleware';
 import { getToken, loginRequired } from '../middlewares/auth.middleware';
@@ -8,23 +7,26 @@ import { User } from '../models/account/User';
 import { HttpError, PermissionsDeniedError } from '../errors';
 import { hasPermissions, validatePermissions } from '../middlewares/has-permitions.middleware';
 import { Role } from '../models/account/Role';
-import { Group } from '../models/Group';
-import { randomBytes } from 'crypto';
-import { Model } from '../models';
+import { Group } from '../models/account/Group';
+import { randomBytes, randomFill } from 'crypto';
+
+function createPassword(): string {
+    return Math.random().toString(36).slice(2) +
+        Math.random().toString(36).toUpperCase().slice(2);
+}
 
 export default express.Router()
     .post("/login",
         bodyValidation(Joi.object({
-            login: Joi.string().trim().not("").max(50).alphanum().required(),
+            login: Joi.string().trim().max(50).required(),
             password: Joi.string().trim().required(),
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                const repository = getRepository(User);
                 const { login, password } = request.body;
 
                 // Поиск пользователя.
-                let user = await repository.findOne({
+                let user = await User.findOne({
                     where: {
                         "login": login,
                         "active": true,
@@ -48,29 +50,27 @@ export default express.Router()
         loginRequired(),
         hasPermissions("can_register"),
         bodyValidation(Joi.object({
-            login: Joi.string().trim().not("").max(50).alphanum().required(),
+            login: Joi.string().trim().max(50).required(),
             password: Joi.string().trim().min(8).default(null),
 
-            name: Joi.string().trim().not("").max(50).alphanum().required(),
-            lastname: Joi.string().trim().not("").max(50).alphanum().required(),
-            surname: Joi.string().trim().not("").max(50).alphanum().required(),
+            name: Joi.string().trim().max(50).required(),
+            lastname: Joi.string().trim().max(50).required(),
+            surname: Joi.string().trim().max(50).required(),
             email: Joi.string().trim().email().default(null),
 
-            role: Joi.string().trim().allow("Students", "Teachers", "Admins").default("Students"),
+            role: Joi.string().trim().allow("Students", "Teachers", "Admins").only().default("Students"),
             group: Joi.number().integer().positive(),
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                const repository = getRepository(User);
-                const roleRepository = getRepository(Role);
                 const { login, password, name, lastname, surname, email, role, group } = request.body;
 
                 // Проверка прав для создания учёной записи данного типа.
-                if (!await validatePermissions(`register_${(role as string).toLowerCase()}`, response.locals["user"], response.locals["permissions"]))
+                if (!await validatePermissions(`can_register_${(role as string).toLowerCase()}`, response.locals["user"], response.locals["permissions"]))
                     throw new PermissionsDeniedError();
 
                 // Поиск пользователя с таким-же логином.
-                let user = await repository.findOne({
+                let user = await User.findOne({
                     where: {
                         "login": login,
                     }
@@ -78,7 +78,7 @@ export default express.Router()
 
                 if (!user) {
                     // Создание нового пользователя.
-                    user = repository.create({
+                    user = User.create({
                         "login": login,
                         "name": name,
                         "lastname": lastname,
@@ -86,13 +86,13 @@ export default express.Router()
                         "email": email,
                     });
 
-                    const _password = password || randomBytes(32).toString("utf-8");
+                    const _password = password || createPassword();
 
                     // Установка пароля.
                     user = await User.setPassword(user, _password);
 
                     // Указание типа учётной записи.
-                    user.role = await roleRepository.findOneOrFail({
+                    user.role = <any>await Role.findOneOrFail({
                         where: {
                             "name": role,
                         },
@@ -101,8 +101,7 @@ export default express.Router()
 
                     // Заполнение доп. поля для студентов.
                     if (role === "Students") {
-                        const groupRepository = getRepository(Group);
-                        user.group = await groupRepository.findOneOrFail({
+                        user.group = <any>await Group.findOneOrFail({
                             where: {
                                 "id": group,
                             },
@@ -111,7 +110,7 @@ export default express.Router()
                     }
 
                     // Сохранение.
-                    user = await repository.save(user);
+                    user = await User.save(user);
 
                     // Отправка ответа
                     return response.status(200).json({
@@ -142,13 +141,14 @@ export default express.Router()
             try {
                 return response.status(200).json(
                     await User.toFlat(response.locals["user"], [
+                        "id",
                         "name",
                         "lastname",
                         "surname",
                         "email",
                     ], {
                         "role": async instance => {
-                            let role = instance.role;
+                            let role = await instance.role;
 
                             if (role)
                                 return role.name;
@@ -156,9 +156,9 @@ export default express.Router()
                                 return null;
                         },
                         "group": async instance => {
-                            let group = instance.group;
+                            let group = await instance.group;
                             if (group)
-                                return await Model.toFlat(group, [
+                                return await Group.toFlat(group, [
                                     "id",
                                     "name",
                                 ]);
@@ -180,7 +180,6 @@ export default express.Router()
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                const repository = getRepository(User);
                 const { password, email } = request.body;
                 let user = response.locals["user"];
 
@@ -191,7 +190,7 @@ export default express.Router()
                     user.email = email;
 
                 if (password || email)
-                    await repository.save(user);
+                    user = await User.save(user);
 
                 return response.status(200).send();
 
