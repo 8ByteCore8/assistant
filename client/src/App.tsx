@@ -8,6 +8,7 @@ import Header from "./components/header";
 import Footer from "./components/footer";
 import {useDispatch, useSelector} from "react-redux";
 import {setAuthorizationStatus, setUserData} from "./reducers/userReducer";
+import Project from "./pages/Project";
 
 const App = (props: any) => {
     const dispatch = useDispatch();
@@ -56,7 +57,8 @@ const App = (props: any) => {
                     <Header/>
                     <div className="mainWrapper container">
                         <Switch>
-                            <Route path='/' exact component={HomePage}/>
+                            <Route path={["/", "/project/"]} exact component={HomePage}/>
+                            <Route path='/project/:id'  component={Project}/>
                             <Route component={NotFoundPage}/>
                         </Switch>
                     </div>

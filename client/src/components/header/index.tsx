@@ -4,7 +4,7 @@ import {Link} from "react-router-dom";
 import {setAuthorizationStatus} from "../../reducers/userReducer";
 import {useDispatch, useSelector} from "react-redux";
 import {useCookies} from "react-cookie";
-import { PersonCircle, PersonBoundingBox, BoxArrowRight } from 'react-bootstrap-icons';
+import {PersonCircle, PersonBoundingBox, BoxArrowRight, Gear} from 'react-bootstrap-icons';
 
 const Header = (props: any) => {
     const dispatch = useDispatch();
@@ -27,6 +27,7 @@ const Header = (props: any) => {
                             {userData.lastname} {userData.name} <PersonCircle className="headerPersonIcon" />
                             <ul className="headerProfileDropdown">
                                 <li><PersonBoundingBox/> Профіль</li>
+                                <li><Gear/> Налаштування</li>
                                 <li onClick={exit}><BoxArrowRight/> Вихід</li>
                             </ul>
                         </div>

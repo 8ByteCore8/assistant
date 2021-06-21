@@ -2,6 +2,10 @@ body{
     background-color: #E8E9EE !important;
 }
 
+a:hover{
+    text-decoration: none !important;
+}
+
 .mainWrapper{
     margin-top: 70px;
     padding-top: 40px;

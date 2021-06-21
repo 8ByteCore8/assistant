@@ -1,13 +1,13 @@
 import React, {useEffect} from 'react';
 import UserProjects from '../../components/userProjects';
-import {setAuthorizationStatus, setUserData} from "../../reducers/userReducer";
+import './home.css';
 
 const Home = (props: any) => {
     return (
-        <>
-            <h2 className="standardTitle">Активні проекти</h2>
+        <div className="homePageWrapper">
+            <h2 className="standardTitle homeTitle">Активні проекти</h2>
             <UserProjects/>
-        </>
+        </div>
     );
 };
 

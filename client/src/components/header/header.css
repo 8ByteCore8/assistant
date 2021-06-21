@@ -59,17 +59,23 @@
     list-style-type: none;
     position: absolute;
     padding: 0;
-    width: 100%;
     top: 100%;
     left: 0;
     background-color: #fff;
     border: 1px solid #c1c1c1;
+    width: 156px;
 }
 
 .headerProfileDropdown li{
     padding: 6px 10px;
+    display: flex;
+    align-items: center;
 }
 
 .headerProfileDropdown li:hover{
     background-color: #E8E9EE;
+}
+
+.headerProfileDropdown li svg{
+    margin-right: 5px;
 }
