@@ -5,10 +5,9 @@ import { bodyValidation } from '../middlewares/body-validation.middleware';
 import { getToken, loginRequired } from '../middlewares/auth.middleware';
 import { User } from '../models/account/User';
 import { HttpError, PermissionsDeniedError } from '../errors';
-import { hasPermissions, validatePermissions } from '../middlewares/has-permitions.middleware';
+import { validatePermissions } from '../middlewares/has-permitions.middleware';
 import { Role } from '../models/account/Role';
 import { Group } from '../models/account/Group';
-import { randomBytes, randomFill } from 'crypto';
 
 function createPassword(): string {
     return Math.random().toString(36).slice(2) +
@@ -48,7 +47,6 @@ export default express.Router()
     )
     .post("/register",
         loginRequired(),
-        hasPermissions("can_register"),
         bodyValidation(Joi.object({
             login: Joi.string().trim().max(50).required(),
             password: Joi.string().trim().min(8).default(null),
@@ -66,7 +64,7 @@ export default express.Router()
                 const { login, password, name, lastname, surname, email, role, group } = request.body;
 
                 // Проверка прав для создания учёной записи данного типа.
-                if (!await validatePermissions(`can_register_${(role as string).toLowerCase()}`, response.locals["user"], response.locals["permissions"]))
+                if (!await validatePermissions(`can_create_${(role as string).toLowerCase()}`, response.locals["user"], response.locals["permissions"]))
                     throw new PermissionsDeniedError();
 
                 // Поиск пользователя с таким-же логином.
@@ -117,6 +115,50 @@ export default express.Router()
                         "login": login,
                         "password": _password,
                     });
+                }
+                else
+                    throw new HttpError("User with this login already exists.", 400);
+            } catch (error) {
+                return next(error);
+            }
+        }
+    )
+    // TODO: Сделать изменение пользователя.
+    .put("/",
+        loginRequired(),
+        bodyValidation(Joi.object({
+            "id": Joi.number().integer().positive().required(),
+            "name": Joi.string().trim().max(50),
+            "lastname": Joi.string().trim().max(50),
+            "surname": Joi.string().trim().max(50),
+
+            "active": Joi.boolean(),
+
+            "group": Joi.number().integer().positive(),
+        }).required()),
+        async function (request: Request, response: Response, next: NextFunction) {
+            try {
+                const { id, name, lastname, surname, role, group } = request.body;
+
+                // Проверка прав для создания учёной записи данного типа.
+                if (!await validatePermissions(`can_create_${(role as string).toLowerCase()}`, response.locals["user"], response.locals["permissions"]))
+                    throw new PermissionsDeniedError();
+
+                // Поиск пользователя с таким-же логином.
+                let user = await User.preload(
+                    request.body
+                );
+
+                if (user) {
+                    // Сохранение.
+                    user = await User.save(user);
+
+                    // Отправка ответа
+                    return response.status(200).json(
+                        await User.toFlat(user, [
+                            'id'
+                        ])
+                    );
                 }
                 else
                     throw new HttpError("User with this login already exists.", 400);

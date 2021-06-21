@@ -19,11 +19,9 @@ async function main() {
 
     const permissions = await repositories["permission"].save(repositories["permission"].create([
         {
-            "name": "can_register"
+            "name": "can_create_students"
         }, {
-            "name": "can_register_students"
-        }, {
-            "name": "can_register_teachers"
+            "name": "can_create_teachers"
         }, {
             "name": "can_create_project"
         }, {
@@ -41,11 +39,10 @@ async function main() {
             "name": "Students",
         }, {
             "name": "Teachers",
-            "permissions":<any> [
+            "permissions": <any>[
                 permissions[0],
-                permissions[1],
+                permissions[2],
                 permissions[3],
-                permissions[4],
             ]
         }, {
             "name": "Admins",
@@ -54,7 +51,6 @@ async function main() {
                 permissions[1],
                 permissions[2],
                 permissions[3],
-                permissions[4],
             ]
         }
     ]));

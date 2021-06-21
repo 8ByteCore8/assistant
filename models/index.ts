@@ -5,7 +5,7 @@ export type Relations<T> = {
     [P in keyof T]?: (instance: T) => Promise<any | any[]>
 };
 
-export abstract class Model  extends BaseEntity{
+export abstract class Model extends BaseEntity {
     /**
      * Возвращает имя красса модели на основе типа или екземпляра.
      * @param model Екземпляр или тип модели.
@@ -19,8 +19,14 @@ export abstract class Model  extends BaseEntity{
     static toFlat<T>(instances: T[], fields: (keyof T)[], relations?: Relations<T>): Promise<object[]>;
     static toFlat<T>(instance: T, fields: (keyof T)[], relations?: Relations<T>): Promise<object>;
     static async toFlat<T>(instance: T | T[], fields: (keyof T)[], relations?: Relations<T>) {
-        if (instance instanceof Array)
-            return instance.map(item => Model.toFlat(item, fields, relations));
+        if (instance instanceof Array) {
+            let result = [];
+
+            for (const item of instance)
+                result.push(await Model.toFlat(item, fields, relations));
+
+            return result;
+        }
 
         let flat_instance = {};
         for (const key of (fields as string[])) {
