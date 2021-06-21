@@ -107,24 +107,7 @@ export default Router()
                 }));
 
 
-                return response.status(200).json(
-                    await Model.toFlat(project, [
-                        "id",
-                        "name",
-                        "description",
-                    ], {
-                        tasks: async instance => await Task.toFlat(await instance.tasks, [
-                            "id",
-                            "name",
-                            "description",
-                            "validator",
-                        ]),
-                        groups: async instance => await Group.toFlat(await instance.groups, [
-                            "id",
-                            "name"
-                        ])
-                    })
-                );
+                return response.status(200).send()
             } catch (error) {
                 return next(error);
             }
@@ -181,24 +164,7 @@ export default Router()
                 project = await project.save();
 
 
-                return response.status(200).json(
-                    await Project.toFlat(project, [
-                        "id",
-                        "name",
-                        "description",
-                    ], {
-                        "tasks": async instance => await Task.toFlat(await instance.tasks, [
-                            "id",
-                            "name",
-                            "description",
-                            "validator",
-                        ]),
-                        groups: async instance => await Group.toFlat(await instance.groups, [
-                            "id",
-                            "name"
-                        ])
-                    })
-                );
+                return response.status(200).send()
             } catch (error) {
                 return next(error);
             }
