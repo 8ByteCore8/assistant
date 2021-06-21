@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import './login.css';
 import {setAuthorizationStatus} from "../../reducers/userReducer";
 import {useDispatch} from "react-redux";
@@ -16,7 +16,7 @@ const Login = (props: any) => {
     const onSubmit = async (e: any) => {
         e.preventDefault();
 
-        const res = await fetch("http://localhost:3000/api/auth", {
+        const res = await fetch("http://localhost:3000/api/users/login", {
             method: "POST",
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({login, password})
@@ -31,14 +31,14 @@ const Login = (props: any) => {
                 })
                 dispatch(setAuthorizationStatus("authorized"));
             } else {
-                if (body.error == "Invalid login data.") {
+                if (body.error === "Invalid login data.") {
                     setError("Невірно введено ім'я користувача або пароль.")
                 } else {
-                    setError("Невідома помилка серверу. Спробуйте пізніше.")
+                    setError("Невідома помилка сервера. Спробуйте пізніше.")
                 }
             }
         }catch (e) {
-            return setError("Невідома помилка серверу. Спробуйте пізніше. Код: " + res.status);
+            return setError("Невідома помилка сервера. Спробуйте пізніше. Код: " + res.status);
         }
     };
 

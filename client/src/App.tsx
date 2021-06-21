@@ -7,37 +7,45 @@ import NotFoundPage from "./pages/NotFound";
 import Header from "./components/header";
 import Footer from "./components/footer";
 import {useDispatch, useSelector} from "react-redux";
-import {setAuthorizationStatus} from "./reducers/userReducer";
+import {setAuthorizationStatus, setUserData} from "./reducers/userReducer";
 
-const App = () => {
+const App = (props: any) => {
     const dispatch = useDispatch();
 
     const authorizationStatus = useSelector((state: any) => state.user.authorizationStatus);
     const [cookies, setCookie, removeCookie] = useCookies(['session']);
 
     useEffect(() => {
-        if (cookies.session) {
-            fetch("http://localhost:3000/api/auth/check", {
-                method: "POST",
+        const getUserData = async () => {
+            const res = await fetch("http://localhost:3000/api/users/", {
+                method: "GET",
                 headers: {
                     "Authorization": "Bearer " + cookies.session
                 }
-            })
-                .then((result) => {
-                        if (result.ok) {
-                            dispatch(setAuthorizationStatus("authorized"));
-                        } else {
-                            dispatch(setAuthorizationStatus("notAuthorized"));
-                            removeCookie("session");
-                        }
-                    },
-                    (error) => {
-                        console.log(error);
-                    })
+            });
+
+            try {
+                if(res.ok){
+                    const userData = await res.json();
+                    dispatch(setUserData({
+                        authorizationStatus: "authorized",
+                        ...userData
+                    }));
+                }else{
+                    dispatch(setAuthorizationStatus("notAuthorized"));
+                    removeCookie("session");
+                }
+            }catch (e){
+                console.log(e);
+            }
+        }
+
+        if (cookies.session) {
+            getUserData();
         } else {
             dispatch(setAuthorizationStatus("notAuthorized"));
         }
-    }, []);
+    }, [cookies]);
 
     switch (authorizationStatus) {
         case "needConfirmation":

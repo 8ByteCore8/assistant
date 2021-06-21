@@ -1,10 +1,13 @@
-import React from 'react';
+import React, {useEffect} from 'react';
+import UserProjects from '../../components/userProjects';
+import {setAuthorizationStatus, setUserData} from "../../reducers/userReducer";
 
-const Home = (props:any) => {
+const Home = (props: any) => {
     return (
-        <div>
-            <p>Home page!</p>
-        </div>
+        <>
+            <h2 className="standardTitle">Активні проекти</h2>
+            <UserProjects/>
+        </>
     );
 };
 

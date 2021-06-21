@@ -1,3 +1,18 @@
+body{
+    background-color: #E8E9EE !important;
+}
+
 .mainWrapper{
-    padding-top: 70px;
+    margin-top: 70px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    background-color: #fff;
+    color: #28344C;
+    box-shadow: 0px 1px 3px 0px rgba(34, 60, 80, 0.1);
+}
+
+.standardTitle{
+    font-size: 1.20em;
+    font-weight: 700;
+    text-transform: uppercase;
 }
