@@ -24,10 +24,14 @@ const Header = (props: any) => {
                     <div className="col-9"><Link to="/" className="logoText">ASSISTANT</Link></div>
                     <div className="col-3 headerProfileWrapper">
                         <div className="headerProfile">
-                            {userData.lastname} {userData.name} <PersonCircle className="headerPersonIcon" />
+                            {userData.lastname} {userData.name} <PersonCircle className="headerPersonIcon"/>
                             <ul className="headerProfileDropdown">
-                                <li><PersonBoundingBox/> Профіль</li>
-                                <li><Gear/> Налаштування</li>
+                                <Link to="/profile">
+                                    <li><PersonBoundingBox/> Профіль</li>
+                                </Link>
+                                <Link to="/editProfile">
+                                    <li><Gear/> Налаштування</li>
+                                </Link>
                                 <li onClick={exit}><BoxArrowRight/> Вихід</li>
                             </ul>
                         </div>

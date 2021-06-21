@@ -1,12 +1,16 @@
-body{
+body {
     background-color: #E8E9EE !important;
 }
 
-a:hover{
+a {
+    color: #28344C !important;
+}
+
+a:hover {
     text-decoration: none !important;
 }
 
-.mainWrapper{
+.mainWrapper {
     margin-top: 70px;
     padding-top: 40px;
     padding-bottom: 40px;
@@ -15,8 +19,10 @@ a:hover{
     box-shadow: 0px 1px 3px 0px rgba(34, 60, 80, 0.1);
 }
 
-.standardTitle{
+.standardTitle {
     font-size: 1.20em;
     font-weight: 700;
     text-transform: uppercase;
+    padding: 5px 0 5px 20px;
+    border-left: 5px solid #1a3c66;
 }

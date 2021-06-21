@@ -42,7 +42,7 @@ const UserProjects = (props: any) => {
         getProjectList();
     }, []);
 
-    const RETURN_LOADED = projectList.length > 0 ?
+    const RETURN_LOADED_CONTENT = projectList.length > 0 ?
         (
             <div className="userProjectsWrapper">
                 <div className="userProjectList">
@@ -71,7 +71,7 @@ const UserProjects = (props: any) => {
         );
 
     return IsLoaded ?
-        RETURN_LOADED :
+        RETURN_LOADED_CONTENT :
         (
             <div className="userProjectsWrapper">
                 <div className="userProjectList">
@@ -85,8 +85,7 @@ const UserProjects = (props: any) => {
                     ))}
                 </div>
             </div>
-        )
-
+        );
 };
 
 export default UserProjects;

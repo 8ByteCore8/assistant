@@ -9,6 +9,8 @@ import Footer from "./components/footer";
 import {useDispatch, useSelector} from "react-redux";
 import {setAuthorizationStatus, setUserData} from "./reducers/userReducer";
 import Project from "./pages/Project";
+import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
 
 const App = (props: any) => {
     const dispatch = useDispatch();
@@ -59,6 +61,8 @@ const App = (props: any) => {
                         <Switch>
                             <Route path={["/", "/project/"]} exact component={HomePage}/>
                             <Route path='/project/:id'  component={Project}/>
+                            <Route path='/profile'  component={Profile}/>
+                            <Route path='/editProfile'  component={EditProfile}/>
                             <Route component={NotFoundPage}/>
                         </Switch>
                     </div>
