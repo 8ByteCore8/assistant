@@ -52,12 +52,7 @@ export default express.Router()
 
                     group = await Group.save(group);
 
-                    return response.status(200).json(
-                        await Group.toFlat(group, [
-                            "id",
-                            "name"
-                        ])
-                    );
+                    return response.status(200).send()
                 }
                 throw new HttpError("Group with this login already exists.", 400);
             } catch (error) {
@@ -116,12 +111,7 @@ export default express.Router()
 
                 group = await Group.save(group);
 
-                return response.status(200).json(
-                    await Group.toFlat(group, [
-                        "id",
-                        "name"
-                    ])
-                );
+                return response.status(200).send()
             } catch (error) {
                 return next(error);
             }

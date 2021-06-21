@@ -154,11 +154,7 @@ export default express.Router()
                     user = await User.save(user);
 
                     // Отправка ответа
-                    return response.status(200).json(
-                        await User.toFlat(user, [
-                            'id'
-                        ])
-                    );
+                    return response.status(200).send();
                 }
                 else
                     throw new HttpError("User with this login already exists.", 400);
