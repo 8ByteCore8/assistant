@@ -13,7 +13,7 @@ ReactDOM.render(
     <Provider store={store}>
         <CookiesProvider>
             <Router>
-                <App/>
+                <App test="123"/>
             </Router>
         </CookiesProvider>
     </Provider>,

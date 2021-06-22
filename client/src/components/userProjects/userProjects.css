@@ -1,0 +1,50 @@
+.userProjectsWrapper{
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+
+.userProjectList{
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+}
+
+.userProjectBlock{
+    width: calc(25% - 8px);
+    margin: 0 4px 10px 4px;
+    border: 1px solid #e8e9ee;
+    transition: 0.35s;
+}
+
+.userProjectBlock:hover{
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.10);
+}
+
+.userProjectBlockInfo{
+    padding: 10px 15px;
+}
+
+.userProjectBlockName{
+    font-weight: 500;
+    color: #28344C;
+}
+
+.userProjectBlockImage{
+    width: 100%;
+    height: 150px !important;
+    background-position: center;
+    background-size: cover;
+}
+
+.userProjectEmptyDataWrapper{
+    text-align: center;
+    margin-top: 40px;
+}
+
+.userProjectEmptyDataWrapper img {
+    width: 100%;
+    max-width: 150px;
+    margin-bottom: 25px;
+}

@@ -4,11 +4,11 @@
     width: 100%;
     align-items: center;
     border-bottom: 1px solid #c1c1c1;
+    background-color: #fff;
 }
 
 .logoText{
     font-weight: bolder;
-    color: #000 !important;
     text-decoration: none !important;
 }
 
@@ -16,9 +16,65 @@
     height: 55px;
     display: flex;
     align-items: center;
+    font-weight: 500;
 }
 
 .headerExit .btn{
     color: #fff;
     background-color: #474747;
+}
+
+.headerProfileWrapper{
+    height: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.headerProfile{
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 10px;
+    cursor: pointer;
+    max-width: fit-content;
+    position: relative;
+}
+
+.headerProfile:hover{
+    background-color: #E8E9EE;
+}
+
+.headerProfile:hover .headerProfileDropdown{
+    display: block;
+}
+
+.headerPersonIcon{
+    font-size: 25px;
+    margin-left: 5px;
+}
+
+.headerProfileDropdown{
+    display: none;
+    list-style-type: none;
+    position: absolute;
+    padding: 0;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #c1c1c1;
+    width: 156px;
+}
+
+.headerProfileDropdown li{
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+}
+
+.headerProfileDropdown li:hover{
+    background-color: #E8E9EE;
+}
+
+.headerProfileDropdown li svg{
+    margin-right: 5px;
 }
