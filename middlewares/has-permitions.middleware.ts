@@ -63,7 +63,15 @@ export function permissions(): NextHandleFunction {
 
             if (user) {
                 // Права доступа пользователя
-                let all_permissions: Permission[] = await User.getAllPermissions(user);
+                let all_permissions = await user.permissions;
+
+                let role = await user.role;
+                if (role) {
+                    response.locals["role"] = role;
+                    all_permissions = all_permissions.concat(await role.permissions);
+                }
+                else
+                    response.locals["role"] = null;
 
                 // Названия прав доступа
                 response.locals["permissions"] = [];

@@ -6,20 +6,27 @@ import { Permission } from "./Permission";
 /**
  * Роли пользователей.
  */
-@Entity()
+ @Entity({
+    name: "roles",
+    orderBy: {
+        name: "ASC"
+    },
+})
 export class Role extends Model {
 
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        name: "id",
+    })
     id: number;
 
     @Column({
+        name: "name",
         length: 50,
         unique: true,
     })
     public name: string;
 
-    @ManyToMany(() => Permission,{
-    })
+    @ManyToMany(() => Permission)
     @JoinTable()
     public permissions: Promise<Permission[]>;
 

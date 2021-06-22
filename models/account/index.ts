@@ -11,17 +11,20 @@ import { Role } from "./Role";
 export abstract class AbstractUser extends Model {
 
     @Column({
+        name: "login",
         length: 50,
         unique: true
     })
     public login: string;
 
     @Column({
+        name: "password",
         length: 60,
     })
     public password: string;
 
     @Column({
+        name: "active",
         default: true,
         select: false
     })
@@ -32,26 +35,16 @@ export abstract class AbstractUser extends Model {
     })
     public role: Promise<Role>;
 
-    @ManyToMany(() => Permission, {
-    })
+    @ManyToMany(() => Permission)
     @JoinTable()
     public permissions: Promise<Permission[]>;
 
     @Column({
+        name: "superuser",
         default: false,
     })
     public superuser: boolean;
 
-    public static async getAllPermissions<T extends AbstractUser>(user: T): Promise<Permission[]> {
-
-        let permissions = await user.permissions;
-
-        let role = await user.role;
-        if (role)
-            permissions = permissions.concat(await role.permissions);
-
-        return permissions;
-    }
 
     /**
      * Меняет пароль пользователя.

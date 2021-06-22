@@ -1,11 +1,11 @@
 import express, { NextFunction } from 'express';
 import Joi from 'joi';
-import { Request, Response } from '..';
+import { Permissions, Request, Response } from '..';
 import { bodyValidation } from '../middlewares/body-validation.middleware';
 import { getToken, loginRequired } from '../middlewares/auth.middleware';
 import { User } from '../models/account/User';
-import { HttpError, PermissionsDeniedError } from '../errors';
-import { validatePermissions } from '../middlewares/has-permitions.middleware';
+import { PermissionsDeniedError } from '../errors';
+import { hasPermissions, validatePermissions } from '../middlewares/has-permitions.middleware';
 import { Role } from '../models/account/Role';
 import { Group } from '../models/account/Group';
 
@@ -39,7 +39,7 @@ export default express.Router()
                         "token": await getToken(user),
                     });
                 }
-                throw new HttpError("Invalid login data.", 403);
+                throw new PermissionsDeniedError();
             } catch (error) {
                 return next(error);
             }
@@ -47,117 +47,82 @@ export default express.Router()
     )
     .post("/register",
         loginRequired(),
-        bodyValidation(Joi.object({
-            login: Joi.string().trim().max(50).required(),
-            password: Joi.string().trim().min(8).default(null),
+        bodyValidation(Joi.object([
+            {
+                login: Joi.string().trim().max(50).required(),
 
-            name: Joi.string().trim().max(50).required(),
-            lastname: Joi.string().trim().max(50).required(),
-            surname: Joi.string().trim().max(50).required(),
-            email: Joi.string().trim().email().default(null),
+                name: Joi.string().trim().max(50).required(),
+                lastname: Joi.string().trim().max(50).required(),
+                surname: Joi.string().trim().max(50).required(),
+                email: Joi.string().trim().email(),
 
-            role: Joi.string().trim().allow("Students", "Teachers", "Admins").only().default("Students"),
-            group: Joi.number().integer().positive(),
-        }).required()),
+                role: Joi.string().trim().allow("Students").only().required(),
+                group: Joi.number().integer().positive().required(),
+            }, {
+                login: Joi.string().trim().max(50).required(),
+
+                name: Joi.string().trim().max(50).required(),
+                lastname: Joi.string().trim().max(50).required(),
+                surname: Joi.string().trim().max(50).required(),
+                email: Joi.string().trim().email(),
+
+                role: Joi.string().trim().allow("Teachers", "Admins").only().required(),
+            }
+        ]).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                const { login, password, name, lastname, surname, email, role, group } = request.body;
+                const { role, group } = request.body;
 
                 // Проверка прав для создания учёной записи данного типа.
-                if (!await validatePermissions(`can_create_${(role as string).toLowerCase()}`, response.locals["user"], response.locals["permissions"]))
-                    throw new PermissionsDeniedError();
+                switch (role) {
+                    case "Students":
+                        if (!await validatePermissions([Permissions.teacher, Permissions.admin], response.locals["user"], response.locals["permissions"]))
+                            throw new PermissionsDeniedError();
+                        break;
+                    case "Teachers":
+                        if (!await validatePermissions(Permissions.admin, response.locals["user"], response.locals["permissions"]))
+                            throw new PermissionsDeniedError();
+                        break;
+                    default:
+                        if (!await validatePermissions("", response.locals["user"], response.locals["permissions"]))
+                            throw new PermissionsDeniedError();
+                        break;
+                }
 
-                // Поиск пользователя с таким-же логином.
-                let user = await User.findOne({
-                    where: {
-                        "login": login,
-                    }
-                });
 
-                if (!user) {
-                    // Создание нового пользователя.
-                    user = User.create({
-                        "login": login,
-                        "name": name,
-                        "lastname": lastname,
-                        "surname": surname,
-                        "email": email,
-                    });
-
-                    const _password = password || createPassword();
-
-                    // Установка пароля.
-                    user = await User.setPassword(user, _password);
-
-                    // Указание типа учётной записи.
-                    user.role = <any>await Role.findOneOrFail({
+                // Создание нового пользователя.
+                let user = User.create({
+                    ...request.body,
+                    role: <any>await Role.findOneOrFail({
                         where: {
                             "name": role,
                         },
                         cache: true,
-                    });
+                    })
+                } as Object);
 
-                    // Заполнение доп. поля для студентов.
-                    if (role === "Students") {
-                        user.group = <any>await Group.findOneOrFail({
-                            where: {
-                                "id": group,
-                            },
-                            cache: true
-                        });
-                    }
+                let _password = createPassword();
+                // Установка пароля.
+                user = await User.setPassword(user, _password);
 
-                    // Сохранение.
-                    user = await User.save(user);
-
-                    // Отправка ответа
-                    return response.status(200).json({
-                        "login": login,
-                        "password": _password,
+                // Заполнение доп. поля для студентов.
+                if (role === "Students") {
+                    user.group = <any>await Group.findOneOrFail({
+                        where: {
+                            "id": group,
+                        },
+                        cache: true
                     });
                 }
-                else
-                    throw new HttpError("User with this login already exists.", 400);
-            } catch (error) {
-                return next(error);
-            }
-        }
-    )
-    // TODO: Сделать изменение пользователя.
-    .put("/",
-        loginRequired(),
-        bodyValidation(Joi.object({
-            "id": Joi.number().integer().positive().required(),
-            "name": Joi.string().trim().max(50),
-            "lastname": Joi.string().trim().max(50),
-            "surname": Joi.string().trim().max(50),
 
-            "active": Joi.boolean(),
+                // Сохранение.
+                user = await User.save(user);
 
-            "group": Joi.number().integer().positive(),
-        }).required()),
-        async function (request: Request, response: Response, next: NextFunction) {
-            try {
-                const { id, name, lastname, surname, role, group } = request.body;
-
-                // Проверка прав для создания учёной записи данного типа.
-                if (!await validatePermissions(`can_create_${(role as string).toLowerCase()}`, response.locals["user"], response.locals["permissions"]))
-                    throw new PermissionsDeniedError();
-
-                // Поиск пользователя с таким-же логином.
-                let user = await User.preload(
-                    request.body
-                );
-
-                if (user) {
-                    // Сохранение.
-                    user = await User.save(user);
-
-                    // Отправка ответа
-                    return response.status(200).send();
-                }
-                else
-                    throw new HttpError("User with this login already exists.", 400);
+                // Отправка ответа
+                return response.status(200).json({
+                    "login": request.body["login"],
+                    "password": _password,
+                });
             } catch (error) {
                 return next(error);
             }
@@ -213,25 +178,51 @@ export default express.Router()
     .put("/",
         loginRequired(),
         bodyValidation(Joi.object({
-            password: Joi.string().trim().min(8).default(null),
-            email: Joi.string().trim().email().default(null),
+            password: Joi.string().trim().min(8),
+            email: Joi.string().trim().email(),
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                const { password, email } = request.body;
-                let user = response.locals["user"];
-
-                if (password)
-                    user = await User.setPassword(user, password);
-
-                if (email)
-                    user.email = email;
-
-                if (password || email)
-                    user = await User.save(user);
+                await User.update(
+                    User.getId(response.locals["user"]),
+                    request.body
+                );
 
                 return response.status(200).send();
+            } catch (error) {
+                return next(error);
+            }
+        }
+    )
+    .put("/:id",
+        loginRequired(),
+        hasPermissions([
+            Permissions.teacher,
+            Permissions.admin,
+        ]),
+        bodyValidation(Joi.object({
+            "name": Joi.string().trim().max(50),
+            "lastname": Joi.string().trim().max(50),
+            "surname": Joi.string().trim().max(50),
 
+            "active": Joi.boolean(),
+
+            "group": Joi.number().integer().positive(),
+        }).required()),
+        async function (request: Request, response: Response, next: NextFunction) {
+            try {
+                const { id } = request.params;
+
+                // Обновление данных пользователя.
+                await User.update(
+                    {
+                        id: Number(id),
+                    },
+                    request.body
+                );
+
+                // Отправка ответа
+                return response.status(200).send();
             } catch (error) {
                 return next(error);
             }

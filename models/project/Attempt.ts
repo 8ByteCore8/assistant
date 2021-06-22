@@ -4,14 +4,23 @@ import { User } from "../account/User";
 import { Task } from "./Task";
 
 export enum AttemptStates {
-    PendingAutomaticChecking,
+    PendingAutoChecking,
     PendingChecking,
+    AutoChecked,
     Checked,
 }
 
-@Entity()
+@Entity({
+    name: "attempts",
+    orderBy: {
+        user:"ASC",
+        task:"ASC",
+    }
+})
 export class Attempt extends Model {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        name: "id",
+    })
     id: number;
 
     @ManyToOne(() => Task)
@@ -21,15 +30,31 @@ export class Attempt extends Model {
     user: Promise<User>;
 
     @Column({
+        name: "data",
         length: 2000,
     })
     data: string;
 
     @Column({
+        name: "is_correct",
         nullable: true
     })
     is_correct: boolean;
 
-    @Column()
+    @Column({
+        name: "validator",
+        nullable: true,
+        length: 50,
+    })
+    validator: string;
+
+    @Column({
+        name: "state",
+    })
     state: AttemptStates;
+
+    @Column({
+        name: "created_at",
+    })
+    created_at: Date;
 }

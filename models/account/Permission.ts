@@ -4,13 +4,21 @@ import { Model } from "..";
 /**
  * Роли пользователей.
  */
-@Entity()
+ @Entity({
+    name: "permissions",
+    orderBy: {
+        name: "ASC"
+    }
+})
 export class Permission extends Model {
 
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        name: "id",
+    })
     id: number;
 
     @Column({
+        name: "name",
         length: 50,
         unique: true,
     })

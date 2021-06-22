@@ -5,14 +5,21 @@ import { ParsedQs } from "qs";
 import config from "./config";
 import { User } from "./models/account/User";
 import apiRouter from "./routers/api.router";
+import { Role } from "./models/account/Role";
 
 
+export enum Permissions{
+    student="student",
+    teacher="teacher",
+    admin="admin",
+}
 
 /**
  * Локальные переменные ответа.
  */
 type Locals = {
     user: User;
+    role: Role;
     permissions: string[];
 };
 

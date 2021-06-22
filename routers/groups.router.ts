@@ -1,22 +1,19 @@
 import express, { NextFunction } from 'express';
 import Joi from 'joi';
-import { Request, Response } from '..';
+import { Permissions, Request, Response } from '..';
 import { bodyValidation } from '../middlewares/body-validation.middleware';
 import { loginRequired } from '../middlewares/auth.middleware';
 import { User } from '../models/account/User';
-import { HttpError } from '../errors';
 import { hasPermissions } from '../middlewares/has-permitions.middleware';
 import { Group } from '../models/account/Group';
 
 export default express.Router()
     .get("/",
+        loginRequired(),
+        hasPermissions([Permissions.teacher, Permissions.admin]),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                let groups = await Group.find({
-                    order: {
-                        "name": "ASC"
-                    }
-                });
+                let groups = await Group.find();
 
                 return response.status(200).json(
                     await Group.toFlat(groups, [
@@ -31,43 +28,33 @@ export default express.Router()
     )
     .post("/",
         loginRequired(),
-        hasPermissions("can_create_group"),
+        hasPermissions([Permissions.teacher, Permissions.admin]),
         bodyValidation(Joi.object({
             name: Joi.string().trim().max(50).required(),
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                const { name } = request.body;
 
-                let group = await Group.findOne({
-                    where: {
-                        "name": name
-                    }
-                });
+                await Group.insert(Group.create(
+                    request.body
+                ));
 
-                if (!group) {
-                    group = Group.create({
-                        "name": name,
-                    });
-
-                    group = await Group.save(group);
-
-                    return response.status(200).send()
-                }
-                throw new HttpError("Group with this login already exists.", 400);
+                return response.status(200).send();
             } catch (error) {
                 return next(error);
             }
         }
     )
     .get("/:id",
+        loginRequired(),
+        hasPermissions([Permissions.teacher, Permissions.admin]),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
                 const { id } = request.params;
 
                 let groups = await Group.findOneOrFail({
                     where: {
-                        "id": id,
+                        "id": Number(id),
                     },
                 });
 
@@ -91,27 +78,20 @@ export default express.Router()
     )
     .put("/:id",
         loginRequired(),
-        hasPermissions("can_create_group"),
+        hasPermissions([Permissions.teacher, Permissions.admin]),
         bodyValidation(Joi.object({
-            name: Joi.string().trim().max(50).default(null),
+            name: Joi.string().trim().max(50),
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
                 const { id } = request.params;
-                const { name } = request.body;
 
-                let group = await Group.findOneOrFail({
-                    where: {
-                        "id": id
-                    }
-                });
+                await Group.update(
+                    Number(id),
+                    request.body
+                );
 
-                if (name)
-                    group.name = name;
-
-                group = await Group.save(group);
-
-                return response.status(200).send()
+                return response.status(200).send();
             } catch (error) {
                 return next(error);
             }

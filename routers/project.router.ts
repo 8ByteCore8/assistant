@@ -1,12 +1,11 @@
 import { NextFunction, Router } from "express";
 import Joi from "joi";
-import { DeepPartial, In } from "typeorm";
-import { Request, Response } from "..";
+import { Permissions, Request, Response } from "..";
 import { loginRequired } from "../middlewares/auth.middleware";
 import { bodyValidation } from "../middlewares/body-validation.middleware";
-import { hasPermissions } from "../middlewares/has-permitions.middleware";
-import { Model } from "../models";
+import { hasPermissions, validatePermissions } from "../middlewares/has-permitions.middleware";
 import { Group } from "../models/account/Group";
+import { User } from "../models/account/User";
 import { Project } from "../models/project/Project";
 import { Task } from "../models/project/Task";
 
@@ -15,47 +14,35 @@ export default Router()
         loginRequired(),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                let user = response.locals["user"];
-                let projects: Project[] = await (await user.group).projects;
+                let _projects: Project[];
+
+                if (await validatePermissions(Permissions.admin, response.locals["user"], response.locals["permissions"]))
+                    // Админ видит все проекты
+                    _projects = await Project.find();
+                else if (await validatePermissions(Permissions.admin, response.locals["user"], response.locals["permissions"]))
+                    // Преподаватель видит только те проекты которые создал.
+                    _projects = await Project.find({
+                        where: {
+                            author: response.locals["user"],
+                        }
+                    });
+                else {
+                    // Студент полько проекты его группы.
+                    let _group = await response.locals["user"].group;
+                    _projects = await _group.projects;
+                }
 
                 return response.status(200).json(
-                    await Project.toFlat(projects, [
+                    await Project.toFlat(_projects, [
                         "id",
                         "name",
                         "description",
                     ], {
-                        "tasks": async instance => await Task.toFlat(await instance.tasks, [
+                        "author": async instance => await User.toFlat(await instance.author, [
                             "id",
+                            "lastname",
                             "name",
-                            "description",
-                        ])
-                    })
-                );
-            } catch (error) {
-                return next(error);
-            }
-        }
-    )
-    .get("/:id",
-        async function (request: Request, response: Response, next: NextFunction) {
-            try {
-                const { id } = request.params;
-                let project: Project = await Project.findOne({
-                    where: {
-                        "id": id
-                    }
-                });
-
-                return response.status(200).json(
-                    await Project.toFlat(project, [
-                        "id",
-                        "name",
-                        "description",
-                    ], {
-                        "tasks": async instance => await Task.toFlat(await instance.tasks, [
-                            "id",
-                            "name",
-                            "description",
+                            "surname"
                         ])
                     })
                 );
@@ -66,105 +53,63 @@ export default Router()
     )
     .post("/",
         loginRequired(),
-        hasPermissions("can_create_project"),
+        hasPermissions([Permissions.teacher, Permissions.admin]),
         bodyValidation(Joi.object({
             name: Joi.string().trim().max(100).required(),
             description: Joi.string().trim().max(2000).required(),
             tasks: Joi.array().items(
-                Joi.object({
-                    name: Joi.string().trim().max(100).required(),
-                    description: Joi.string().trim().max(2000).required(),
-                    validator: Joi.string().trim().max(50).default(null),
-                }).required()
-            ).min(1).required(),
+                Joi.number().integer().positive().required()
+            ).default([]),
             groups: Joi.array().items(
                 Joi.number().integer().positive().required()
             ).default([]),
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                const { name, description, tasks, groups } = request.body;
+                request.body["groups"] = await Group.findByIds(request.body["groups"]);
+                request.body["tasks"] = await Task.findByIds(request.body["tasks"]);
+                request.body["author"] = response.locals["user"];
 
-                let _tasks = await Task.save(Task.create(tasks.map((task: DeepPartial<Task>) => {
-                    return {
-                        "name": task.name,
-                        "description": task.description,
-                        "validator": task.validator,
-                    };
-                })));
-
-                let _groups = await Group.find({
-                    where: {
-                        "id": In(groups)
-                    }
+                await Project.insert({
+                    ...request.body,
                 });
 
-                let project = await Project.save(Project.create({
-                    "name": name,
-                    "description": description,
-                    "groups": <any>_groups,
-                    "tasks": <any>_tasks
-                }));
 
-
-                return response.status(200).send()
+                return response.status(200).send();
             } catch (error) {
                 return next(error);
             }
         }
     )
-    .put("/",
+    .put("/:id",
         loginRequired(),
-        hasPermissions("can_create_project"),
+        hasPermissions([Permissions.teacher, Permissions.admin]),
         bodyValidation(Joi.object({
-            id: Joi.number().integer().positive().required(),
-            name: Joi.string().trim().max(100).required(),
-            description: Joi.string().trim().max(2000).required(),
+            name: Joi.string().trim().max(100),
+            description: Joi.string().trim().max(2000),
             tasks: Joi.array().items(
-                Joi.object({
-                    id: Joi.number().integer().positive().default(null),
-                    name: Joi.string().trim().max(100).required(),
-                    description: Joi.string().trim().max(2000).required(),
-                    validator: Joi.string().trim().max(50).default(null),
-                }).required()
-            ).min(1).required(),
+                Joi.number().integer().positive().required()
+            ).default([]),
             groups: Joi.array().items(
                 Joi.number().integer().positive().required()
             ).default([]),
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                const { id, name, description, tasks, groups } = request.body;
+                const { id } = request.params;
 
-                let _groups: Group[] = await Group.find({
-                    where: {
-                        "id": In(groups)
-                    }
-                });
+                request.body["groups"] = await Group.findByIds(request.body["groups"]);
+                request.body["tasks"] = await Task.findByIds(request.body["tasks"]);
 
+                await Project.update(
+                    {
+                        id: Number(id),
+                    },
+                    {
+                        ...request.body,
+                    });
 
-                // TODO: Проверить работает ли это вообще.
-                let _tasks: Task[] = [];
-                for (const task of Task.create(tasks)) {
-                    _tasks.push(
-                        Task.hasId(task)
-                            ? await Task.preload(task)
-                            : task
-                    );
-                }
-
-                let project: Project = await Project.preload({
-                    "id": id,
-                    "name": name,
-                    "description": description,
-                    "groups": <any>_groups,
-                    "tasks": <any>_tasks
-                });
-
-                project = await project.save();
-
-
-                return response.status(200).send()
+                return response.status(200).send();
             } catch (error) {
                 return next(error);
             }

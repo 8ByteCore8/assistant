@@ -1,5 +1,6 @@
 import "reflect-metadata";
 import { createConnection, getRepository } from "typeorm";
+import { Permissions } from "..";
 import config from "../config";
 import { Permission } from "../models/account/Permission";
 import { Role } from "../models/account/Role";
@@ -19,13 +20,11 @@ async function main() {
 
     const permissions = await repositories["permission"].save(repositories["permission"].create([
         {
-            "name": "can_create_students"
+            "name": Permissions.student
         }, {
-            "name": "can_create_teachers"
+            "name": Permissions.teacher
         }, {
-            "name": "can_create_project"
-        }, {
-            "name": "can_create_group"
+            "name": Permissions.admin
         }
     ]));
 
@@ -37,20 +36,18 @@ async function main() {
     const roles = await repositories["role"].save(repositories["role"].create([
         {
             "name": "Students",
+            "permissions": <any>[
+                permissions[0],
+            ]
         }, {
             "name": "Teachers",
             "permissions": <any>[
-                permissions[0],
-                permissions[2],
-                permissions[3],
+                permissions[1],
             ]
         }, {
             "name": "Admins",
             "permissions": <any>[
-                permissions[0],
-                permissions[1],
                 permissions[2],
-                permissions[3],
             ]
         }
     ]));

@@ -6,13 +6,21 @@ import { Project } from "../project/Project";
 /**
  * Группы студентов.
  */
-@Entity()
+@Entity({
+    name: "groups",
+    orderBy: {
+        name: "ASC"
+    }
+})
 export class Group extends Model {
 
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        name: "id",
+    })
     id: number;
 
     @Column({
+        name: "name",
         length: 50,
         unique: true,
     })

@@ -1,4 +1,4 @@
-import { BaseEntity, ObjectType } from "typeorm";
+import { BaseEntity, DeepPartial, ObjectType } from "typeorm";
 import { getClassName } from "../utils";
 
 export type Relations<T> = {
