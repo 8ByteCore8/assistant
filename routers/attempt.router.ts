@@ -83,7 +83,7 @@ export default Router()
                     task: <any>_task,
                     user: <any>response.locals["user"],
                     validator: _task.validator,
-                    state: _task.validator ? AttemptStates.PendingAutomaticChecking : AttemptStates.PendingChecking,
+                    state: _task.validator ? AttemptStates.PendingAutoChecking : AttemptStates.PendingChecking,
                     created_at: Date.now(),
                 });
 
