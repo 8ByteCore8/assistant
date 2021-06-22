@@ -1,4 +1,4 @@
-import { Request, Response } from "..";
+import { Request, Response } from "../types";
 import { NextHandleFunction } from 'connect';
 import { Permission } from "../models/account/Permission";
 import { User } from "../models/account/User";;

@@ -1,6 +1,6 @@
 import { NextFunction, Router } from "express";
 import Joi from "joi";
-import { Permissions, Request, Response } from "..";
+import { Permissions, Request, Response } from "../types";
 import { loginRequired } from "../middlewares/auth.middleware";
 import { bodyValidation } from "../middlewares/body-validation.middleware";
 import { hasPermissions, validatePermissions } from "../middlewares/has-permitions.middleware";

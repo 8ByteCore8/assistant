@@ -1,6 +1,6 @@
 
 import { sign, verify } from "jsonwebtoken";
-import { Request, Response } from "..";
+import { Request, Response } from "../types";
 import configs from "../config";
 import { User } from "../models/account/User";
 import { NextHandleFunction } from 'connect';

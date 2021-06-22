@@ -1,6 +1,6 @@
 import express, { NextFunction } from 'express';
 import Joi from 'joi';
-import { Permissions, Request, Response } from '..';
+import { Permissions, Request, Response } from '../types';
 import { bodyValidation } from '../middlewares/body-validation.middleware';
 import { getToken, loginRequired } from '../middlewares/auth.middleware';
 import { User } from '../models/account/User';

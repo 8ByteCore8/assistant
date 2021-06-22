@@ -1,5 +1,5 @@
 
-import { Request, Response } from "..";
+import { Request, Response } from "../types";
 import { NextFunction } from "express";
 import { HttpError } from "../errors";
 

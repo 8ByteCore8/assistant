@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { createConnection, getRepository } from "typeorm";
-import { Permissions } from "..";
+import { Permissions } from "../types";
 import config from "../config";
 import { Permission } from "../models/account/Permission";
 import { Role } from "../models/account/Role";

@@ -1,5 +1,5 @@
 
-import { Request, Response } from "..";
+import { Request, Response } from "../types";
 import { NextHandleFunction } from 'connect';
 import { NextFunction } from "express";
 

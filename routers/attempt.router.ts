@@ -1,6 +1,6 @@
 import { NextFunction, Router } from "express";
 import Joi from "joi";
-import { Permissions, Request, Response } from "..";
+import { Permissions, Request, Response } from "../types";
 import { loginRequired } from "../middlewares/auth.middleware";
 import { bodyValidation } from "../middlewares/body-validation.middleware";
 import { hasPermissions } from "../middlewares/has-permitions.middleware";
@@ -37,7 +37,7 @@ export default Router()
     )
     .get("/",
         loginRequired(),
-        hasPermissions([Permissions.teacher, Permissions.teacher]),
+        hasPermissions([Permissions.teacher, Permissions.admin]),
         bodyValidation(Joi.object({
             user: Joi.number().integer().positive().required(),
             task: Joi.number().integer().positive().required(),
