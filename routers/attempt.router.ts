@@ -14,7 +14,7 @@ export default Router()
             try {
                 const { task_id } = request.params;
 
-                let _attempt = await Attempt.find({
+                let _attempts = await Attempt.find({
                     where: {
                         user: response.locals["user"],
                         task: Number(task_id)
@@ -22,7 +22,7 @@ export default Router()
                 });
 
                 return response.status(200).json(
-                    await Attempt.toFlat(_attempt, [
+                    await Attempt.toFlat(_attempts, [
                         "id",
                         "data",
                         "is_correct",
@@ -46,7 +46,7 @@ export default Router()
             try {
                 const { user, task } = request.params;
 
-                let _attempt = await Attempt.find({
+                let _attempts = await Attempt.find({
                     where: {
                         user: user,
                         task: task
@@ -54,7 +54,7 @@ export default Router()
                 });
 
                 return response.status(200).json(
-                    await Attempt.toFlat(_attempt, [
+                    await Attempt.toFlat(_attempts, [
                         "id",
                         "data",
                         "is_correct",
@@ -83,8 +83,6 @@ export default Router()
                     task: <any>_task,
                     user: <any>response.locals["user"],
                     validator: _task.validator,
-                    state: _task.validator ? AttemptStates.PendingAutoChecking : AttemptStates.PendingChecking,
-                    created_at: Date.now(),
                 });
 
                 return response.status(200).send();
@@ -93,7 +91,7 @@ export default Router()
             }
         }
     )
-    .put("/:id",
+    .put("/:attempt_id",
         loginRequired(),
         hasPermissions([Permissions.teacher, Permissions.admin]),
         bodyValidation(Joi.object({
@@ -101,10 +99,10 @@ export default Router()
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                const { id } = request.params;
+                const { attempt_id } = request.params;
 
                 await Attempt.update({
-                    id: Number(id),
+                    id: Number(attempt_id),
                 }, {
                     ...request.body,
                     state: AttemptStates.Checked,

@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Model } from "..";
 import { User } from "../account/User";
 import { Task } from "./Task";
@@ -13,8 +13,8 @@ export enum AttemptStates {
 @Entity({
     name: "attempts",
     orderBy: {
-        user:"ASC",
-        task:"ASC",
+        user: "ASC",
+        task: "ASC",
     }
 })
 export class Attempt extends Model {
@@ -57,4 +57,10 @@ export class Attempt extends Model {
         name: "created_at",
     })
     created_at: Date;
+
+    @BeforeInsert()
+    beforeInsert() {
+        this.created_at = new Date();
+        this.state = this.validator ? AttemptStates.PendingAutoChecking : AttemptStates.PendingChecking;
+    }
 }

@@ -28,7 +28,6 @@ export default express.Router()
                 let user = await User.findOne({
                     where: {
                         "login": login,
-                        "active": true,
                     }
                 });
 
@@ -54,7 +53,7 @@ export default express.Router()
                 name: Joi.string().trim().max(50).required(),
                 lastname: Joi.string().trim().max(50).required(),
                 surname: Joi.string().trim().max(50).required(),
-                email: Joi.string().trim().email(),
+                email: Joi.string().trim().email().default(null),
 
                 role: Joi.string().trim().allow("Students").only().required(),
                 group: Joi.number().integer().positive().required(),
@@ -64,7 +63,7 @@ export default express.Router()
                 name: Joi.string().trim().max(50).required(),
                 lastname: Joi.string().trim().max(50).required(),
                 surname: Joi.string().trim().max(50).required(),
-                email: Joi.string().trim().email(),
+                email: Joi.string().trim().email().default(null),
 
                 role: Joi.string().trim().allow("Teachers", "Admins").only().required(),
             }
@@ -205,8 +204,6 @@ export default express.Router()
             "lastname": Joi.string().trim().max(50),
             "surname": Joi.string().trim().max(50),
 
-            "active": Joi.boolean(),
-
             "group": Joi.number().integer().positive(),
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
@@ -222,6 +219,52 @@ export default express.Router()
                 );
 
                 // Отправка ответа
+                return response.status(200).send();
+            } catch (error) {
+                return next(error);
+            }
+        }
+    )
+    .get("/:group_id",
+        loginRequired(),
+        hasPermissions([Permissions.teacher, Permissions.admin]),
+        async function (request: Request, response: Response, next: NextFunction) {
+            try {
+                const { group_id } = request.params;
+
+                let _users = await User.find({
+                    where: {
+                        "group": Number(group_id),
+                    },
+                });
+
+                return response.status(200).json(
+                    await User.toFlat(_users, [
+                        "id",
+                        "name",
+                        "lastname",
+                        "surname",
+                    ])
+                );
+            } catch (error) {
+                return next(error);
+            }
+        }
+    )
+    // TODO: Пофиксить уязвимость с удалением одноранговых и выше пользователей.
+    .delete("/:user_id",
+        loginRequired(),
+        hasPermissions([Permissions.teacher, Permissions.admin]),
+        async function (request: Request, response: Response, next: NextFunction) {
+            try {
+                const { user_id } = request.params;
+
+                let _user = await User.findOneOrFail(Number(user_id));
+
+                await Promise.all([
+                    User.softRemove(_user),
+                ]);
+
                 return response.status(200).send();
             } catch (error) {
                 return next(error);

@@ -6,6 +6,7 @@ import { bodyValidation } from "../middlewares/body-validation.middleware";
 import { hasPermissions } from "../middlewares/has-permitions.middleware";
 import { Project } from "../models/project/Project";
 import { Task } from "../models/project/Task";
+import { Attempt } from "../models/project/Attempt";
 
 export default Router()
     .get("/:project_id",
@@ -56,7 +57,7 @@ export default Router()
             }
         }
     )
-    .put("/:id",
+    .put("/:task_id",
         loginRequired(),
         hasPermissions([Permissions.teacher, Permissions.admin]),
         bodyValidation(Joi.object({
@@ -67,18 +68,44 @@ export default Router()
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                const { id } = request.params;
+                const { task_id } = request.params;
 
                 if (request.body["project"])
                     request.body["project"] = await Project.findOneOrFail(request.body["project"]);
 
                 await Task.update(
                     {
-                        id: Number(id),
+                        id: Number(task_id),
                     },
                     {
                         ...request.body,
                     });
+
+                return response.status(200).send();
+            } catch (error) {
+                return next(error);
+            }
+        }
+    )
+    .delete("/:id",
+        loginRequired(),
+        hasPermissions([Permissions.teacher, Permissions.admin]),
+        async function (request: Request, response: Response, next: NextFunction) {
+            try {
+                const { id } = request.params;
+
+                let _task = await Task.findOneOrFail(Number(id));
+
+                let _attempts = await Attempt.find({
+                    where: {
+                        task: _task,
+                    }
+                });
+
+                await Promise.all([
+                    Task.softRemove(_task),
+                    Attempt.softRemove(_attempts),
+                ]);
 
                 return response.status(200).send();
             } catch (error) {

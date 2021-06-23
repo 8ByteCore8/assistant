@@ -36,7 +36,6 @@ export function auth(): NextHandleFunction {
             response.locals["user"] = await User.findOneOrFail({
                 where: {
                     "id": id,
-                    "active": true
                 },
                 cache: true
             });

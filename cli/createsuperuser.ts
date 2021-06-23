@@ -27,7 +27,6 @@ async function CreateSuperUser(user_data: DeepPartial<User>) {
     const roleRepository = getRepository(Role);
 
     let user = repository.create(user_data);
-    user.active = true;
     user.superuser = true;
 
     user.role = <any>await roleRepository.findOneOrFail({

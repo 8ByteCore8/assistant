@@ -8,6 +8,8 @@ import { Group } from "../models/account/Group";
 import { User } from "../models/account/User";
 import { Project } from "../models/project/Project";
 import { Task } from "../models/project/Task";
+import { Attempt } from "../models/project/Attempt";
+import { In } from "typeorm";
 
 export default Router()
     .get("/",
@@ -81,7 +83,7 @@ export default Router()
             }
         }
     )
-    .put("/:id",
+    .put("/:project_id",
         loginRequired(),
         hasPermissions([Permissions.teacher, Permissions.admin]),
         bodyValidation(Joi.object({
@@ -96,18 +98,49 @@ export default Router()
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                const { id } = request.params;
+                const { project_id } = request.params;
 
                 request.body["groups"] = await Group.findByIds(request.body["groups"]);
                 request.body["tasks"] = await Task.findByIds(request.body["tasks"]);
 
                 await Project.update(
                     {
-                        id: Number(id),
+                        id: Number(project_id),
                     },
                     {
                         ...request.body,
                     });
+
+                return response.status(200).send();
+            } catch (error) {
+                return next(error);
+            }
+        }
+    )
+    .delete("/:id",
+        loginRequired(),
+        hasPermissions([Permissions.teacher, Permissions.admin]),
+        async function (request: Request, response: Response, next: NextFunction) {
+            try {
+                const { id } = request.params;
+
+                let _project = await Project.findOneOrFail(Number(id));
+                let _tasks = await Task.find({
+                    where: {
+                        project: _project,
+                    }
+                });
+                let _attempts = await Attempt.find({
+                    where: {
+                        task: In(_tasks),
+                    }
+                });
+
+                await Promise.all([
+                    Project.softRemove(_project),
+                    Task.softRemove(_tasks),
+                    Attempt.softRemove(_attempts),
+                ]);
 
                 return response.status(200).send();
             } catch (error) {

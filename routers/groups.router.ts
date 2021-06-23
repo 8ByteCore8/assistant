@@ -45,38 +45,7 @@ export default express.Router()
             }
         }
     )
-    .get("/:id",
-        loginRequired(),
-        hasPermissions([Permissions.teacher, Permissions.admin]),
-        async function (request: Request, response: Response, next: NextFunction) {
-            try {
-                const { id } = request.params;
-
-                let groups = await Group.findOneOrFail({
-                    where: {
-                        "id": Number(id),
-                    },
-                });
-
-                return response.status(200).json(
-                    await Group.toFlat(groups, [
-                        "id",
-                        "name"
-                    ], {
-                        users: async instance => await User.toFlat(await instance.users, [
-                            "id",
-                            "name",
-                            "lastname",
-                            "surname",
-                        ])
-                    })
-                );
-            } catch (error) {
-                return next(error);
-            }
-        }
-    )
-    .put("/:id",
+    .put("/:group_id",
         loginRequired(),
         hasPermissions([Permissions.teacher, Permissions.admin]),
         bodyValidation(Joi.object({
@@ -84,12 +53,37 @@ export default express.Router()
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                const { id } = request.params;
+                const { group_id } = request.params;
 
                 await Group.update(
-                    Number(id),
+                    Number(group_id),
                     request.body
                 );
+
+                return response.status(200).send();
+            } catch (error) {
+                return next(error);
+            }
+        }
+    )
+    .delete("/:group_id",
+        loginRequired(),
+        hasPermissions([Permissions.teacher, Permissions.admin]),
+        async function (request: Request, response: Response, next: NextFunction) {
+            try {
+                const { group_id } = request.params;
+
+                let _group = await Group.findOneOrFail(Number(group_id));
+                let _users = await User.find({
+                    where: {
+                        group: _group
+                    }
+                });
+
+                await Promise.all([
+                    Group.softRemove(_group),
+                    User.softRemove(_users),
+                ]);
 
                 return response.status(200).send();
             } catch (error) {

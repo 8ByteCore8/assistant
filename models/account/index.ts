@@ -23,13 +23,6 @@ export abstract class AbstractUser extends Model {
     })
     public password: string;
 
-    @Column({
-        name: "active",
-        default: true,
-        select: false
-    })
-    public active: boolean;
-
     @ManyToOne(() => Role, role => role.users, {
         nullable: true,
     })
