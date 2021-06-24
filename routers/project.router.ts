@@ -120,8 +120,11 @@ export default Router()
             try {
                 const { project_id } = request.params;
 
-                request.body["groups"] = await Group.findByIds(request.body["groups"]);
-                request.body["tasks"] = await Task.findByIds(request.body["tasks"]);
+                if (request.body["groups"])
+                    request.body["groups"] = await Group.findByIds(request.body["groups"]);
+
+                if (request.body["tasks"])
+                    request.body["tasks"] = await Task.findByIds(request.body["tasks"]);
 
                 let _project = await Project.findOneOrFail(Number(project_id));
 
