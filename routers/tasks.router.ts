@@ -47,7 +47,7 @@ export default Router()
 
                 request.body["project"] = await Project.findOneOrFail(request.body["project"]);
 
-                await Task.insert({
+                await Task.save({
                     ...request.body,
                 });
 
@@ -73,13 +73,13 @@ export default Router()
                 if (request.body["project"])
                     request.body["project"] = await Project.findOneOrFail(request.body["project"]);
 
-                await Task.update(
-                    {
-                        id: Number(task_id),
-                    },
-                    {
-                        ...request.body,
-                    });
+                let _task = await Task.findOneOrFail(Number(task_id));
+
+                _task = Task.merge(_task, {
+                    ...request.body,
+                });
+
+                await Task.save(_task);
 
                 return response.status(200).send();
             } catch (error) {

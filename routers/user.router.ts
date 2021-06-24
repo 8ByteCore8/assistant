@@ -103,7 +103,7 @@ export default express.Router()
                 user = await User.setPassword(user, _password);
 
                 // Сохранение.
-                await User.insert(user);
+                await User.save(user);
 
                 // Отправка ответа
                 return response.status(200).json({
@@ -170,10 +170,13 @@ export default express.Router()
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                await User.update(
-                    User.getId(response.locals["user"]),
-                    request.body
-                );
+                let _user = response.locals["user"];
+
+                _user = User.merge(_user, {
+                    ...request.body,
+                });
+
+                await User.save(_user);
 
                 return response.status(200).send();
             } catch (error) {
@@ -181,7 +184,7 @@ export default express.Router()
             }
         }
     )
-    .put("/:id",
+    .put("/:user_id",
         loginRequired(),
         hasPermissions([
             Permissions.teacher,
@@ -196,15 +199,16 @@ export default express.Router()
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                const { id } = request.params;
+                const { user_id } = request.params;
 
                 // Обновление данных пользователя.
-                await User.update(
-                    {
-                        id: Number(id),
-                    },
-                    request.body
-                );
+                let _user = await User.findOneOrFail(Number(user_id));
+
+                _user = User.merge(_user, {
+                    ...request.body,
+                });
+
+                await User.save(_user);
 
                 // Отправка ответа
                 return response.status(200).send();

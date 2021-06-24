@@ -35,9 +35,9 @@ export default express.Router()
         async function (request: Request, response: Response, next: NextFunction) {
             try {
 
-                await Group.insert(Group.create(
-                    request.body
-                ));
+                await Group.save({
+                    ...request.body
+                });
 
                 return response.status(200).send();
             } catch (error) {
@@ -55,10 +55,13 @@ export default express.Router()
             try {
                 const { group_id } = request.params;
 
-                await Group.update(
-                    Number(group_id),
-                    request.body
-                );
+                let _group = await Group.findOneOrFail(Number(group_id));
+
+                _group = Group.merge(_group, {
+                    ...request.body,
+                });
+
+                await Group.save(_group);
 
                 return response.status(200).send();
             } catch (error) {

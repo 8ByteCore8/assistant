@@ -78,7 +78,7 @@ export default Router()
                 const { task } = request.body;
                 let _task = await Task.findOneOrFail(task);
 
-                await Attempt.insert({
+                await Attempt.save({
                     ...request.body,
                     task: <any>_task,
                     user: <any>response.locals["user"],
@@ -101,12 +101,14 @@ export default Router()
             try {
                 const { attempt_id } = request.params;
 
-                await Attempt.update({
-                    id: Number(attempt_id),
-                }, {
+                let _attempt = await Attempt.findOneOrFail(Number(attempt_id));
+
+                _attempt = Attempt.merge(_attempt, {
                     ...request.body,
                     state: AttemptStates.Checked,
                 });
+
+                await Attempt.save(_attempt);
 
                 return response.status(200).send();
             } catch (error) {

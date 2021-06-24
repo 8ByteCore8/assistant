@@ -21,7 +21,7 @@ export default Router()
                 if (await validatePermissions(Permissions.admin, response.locals["user"], response.locals["permissions"]))
                     // Админ видит все проекты
                     _projects = await Project.find();
-                else if (await validatePermissions(Permissions.admin, response.locals["user"], response.locals["permissions"]))
+                else if (await validatePermissions(Permissions.teacher, response.locals["user"], response.locals["permissions"]))
                     // Преподаватель видит только те проекты которые создал.
                     _projects = await Project.find({
                         where: {
@@ -72,11 +72,22 @@ export default Router()
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                request.body["groups"] = await Group.findByIds(request.body["groups"]);
-                request.body["tasks"] = await Task.findByIds(request.body["tasks"]);
+                request.body["groups"] = await Group.find({
+                    where: {
+                        id: In(request.body["groups"])
+                    }
+                });
+
+                console.log(request.body["groups"]);
+
+                request.body["tasks"] = await Task.find({
+                    where: {
+                        id: In(request.body["tasks"])
+                    }
+                });
                 request.body["author"] = response.locals["user"];
 
-                await Project.insert({
+                await Project.save({
                     ...request.body,
                 });
 
@@ -107,13 +118,13 @@ export default Router()
                 request.body["groups"] = await Group.findByIds(request.body["groups"]);
                 request.body["tasks"] = await Task.findByIds(request.body["tasks"]);
 
-                await Project.update(
-                    {
-                        id: Number(project_id),
-                    },
-                    {
-                        ...request.body,
-                    });
+                let _project = await Project.findOneOrFail(Number(project_id));
+
+                _project = Project.merge(_project, {
+                    ...request.body,
+                });
+
+                await Project.save(_project);
 
                 return response.status(200).send();
             } catch (error) {
