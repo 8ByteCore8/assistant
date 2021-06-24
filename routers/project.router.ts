@@ -60,10 +60,10 @@ export default Router()
             name: Joi.string().trim().max(100).required(),
             description: Joi.string().trim().max(2000).required(),
             tasks: Joi.array().items(
-                Joi.number().integer().positive().required()
+                Joi.number().integer().positive()
             ).default([]),
             groups: Joi.array().items(
-                Joi.number().integer().positive().required()
+                Joi.number().integer().positive()
             ).default([]),
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
@@ -90,10 +90,10 @@ export default Router()
             name: Joi.string().trim().max(100),
             description: Joi.string().trim().max(2000),
             tasks: Joi.array().items(
-                Joi.number().integer().positive().required()
+                Joi.number().integer().positive()
             ).default([]),
             groups: Joi.array().items(
-                Joi.number().integer().positive().required()
+                Joi.number().integer().positive()
             ).default([]),
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {

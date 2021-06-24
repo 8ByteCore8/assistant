@@ -1,6 +1,12 @@
 import { ObjectSchema } from "joi";
 import ViewValidator from "./view.validator";
 
+
+export const Validators = {
+    "ViewValidator": new ViewValidator(),
+};
+
+
 export abstract class Validator<Input>  {
     protected abstract inputSchema: ObjectSchema;
     protected abstract validator: () => Promise<boolean>;
@@ -17,8 +23,4 @@ export abstract class Validator<Input>  {
 
         this.correct = await this.validator();
     }
-};
-
-export const Validators = {
-    "viewValidator": new ViewValidator(),
 };

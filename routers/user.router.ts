@@ -46,37 +46,35 @@ export default express.Router()
     )
     .post("/register",
         loginRequired(),
-        bodyValidation(Joi.object([
-            {
-                login: Joi.string().trim().max(50).required(),
+        bodyValidation(Joi.object({
+            login: Joi.string().trim().max(50).required(),
 
-                name: Joi.string().trim().max(50).required(),
-                lastname: Joi.string().trim().max(50).required(),
-                surname: Joi.string().trim().max(50).required(),
-                email: Joi.string().trim().email().default(null),
+            name: Joi.string().trim().max(50).required(),
+            lastname: Joi.string().trim().max(50).required(),
+            surname: Joi.string().trim().max(50).required(),
+            email: Joi.string().trim().email().default(null),
 
-                role: Joi.string().trim().allow("Students").only().required(),
-                group: Joi.number().integer().positive().required(),
-            }, {
-                login: Joi.string().trim().max(50).required(),
-
-                name: Joi.string().trim().max(50).required(),
-                lastname: Joi.string().trim().max(50).required(),
-                surname: Joi.string().trim().max(50).required(),
-                email: Joi.string().trim().email().default(null),
-
-                role: Joi.string().trim().allow("Teachers", "Admins").only().required(),
-            }
-        ]).required()),
+            role: Joi.string().trim().allow("Students").only().required(),
+            group: Joi.number().integer().positive(),
+        }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
-                const { role, group } = request.body;
+                console.log(request.body);
+
 
                 // Проверка прав для создания учёной записи данного типа.
-                switch (role) {
+                switch (request.body["role"]) {
                     case "Students":
                         if (!await validatePermissions([Permissions.teacher, Permissions.admin], response.locals["user"], response.locals["permissions"]))
                             throw new PermissionsDeniedError();
+                        else
+                            // Запихнул суда для опимизации :)
+                            request.body["group"] = await Group.findOneOrFail({
+                                where: {
+                                    "id": request.body["group"],
+                                },
+                                cache: true
+                            });
                         break;
                     case "Teachers":
                         if (!await validatePermissions(Permissions.admin, response.locals["user"], response.locals["permissions"]))
@@ -88,34 +86,24 @@ export default express.Router()
                         break;
                 }
 
+                request.body["role"] = await Role.findOneOrFail({
+                    where: {
+                        name: request.body["role"]
+                    },
+                    cache: true
+                });
 
                 // Создание нового пользователя.
                 let user = User.create({
-                    ...request.body,
-                    role: <any>await Role.findOneOrFail({
-                        where: {
-                            "name": role,
-                        },
-                        cache: true,
-                    })
+                    ...request.body
                 } as Object);
 
+                // Генерация и установка пароля.
                 let _password = createPassword();
-                // Установка пароля.
                 user = await User.setPassword(user, _password);
 
-                // Заполнение доп. поля для студентов.
-                if (role === "Students") {
-                    user.group = <any>await Group.findOneOrFail({
-                        where: {
-                            "id": group,
-                        },
-                        cache: true
-                    });
-                }
-
                 // Сохранение.
-                user = await User.save(user);
+                await User.insert(user);
 
                 // Отправка ответа
                 return response.status(200).json({
