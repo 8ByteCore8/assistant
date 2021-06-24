@@ -45,6 +45,10 @@ export default Router()
                             "lastname",
                             "name",
                             "surname"
+                        ]),
+                        "groups": async instance => await Group.toFlat(await instance.groups, [
+                            "id",
+                            "name",
                         ])
                     })
                 );

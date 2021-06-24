@@ -243,6 +243,12 @@ Note: Также удаляет связаные `User`.
                 "name":"string[50]",
                 "surname":"string[50]"
             }
+        ],
+        "groups": [
+          {
+            "id":"id",
+            "name":"string[50]"
+          }
         ]
     }
 ]
