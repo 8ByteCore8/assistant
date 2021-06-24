@@ -34,11 +34,6 @@ export default Router()
                     _projects = await _group.projects;
                 }
 
-                console.log(_projects);
-                console.log(await _projects[0].author);
-                console.log(await _projects[0].groups);
-
-
                 return response.status(200).json(
                     await Project.toFlat(_projects, [
                         "id",
@@ -54,6 +49,11 @@ export default Router()
                         "groups": async instance => await Group.toFlat(await instance.groups, [
                             "id",
                             "name",
+                        ]),
+                        "tasks": async instance => await Task.toFlat(await instance.tasks, [
+                            "id",
+                            "name",
+                            "description",
                         ])
                     })
                 );

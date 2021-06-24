@@ -26,7 +26,7 @@
   - [6.3. `PUT`](#63-put)
     - [6.3.1. `/api/projects/:project_id` - Редактировать проект.](#631-apiprojectsproject_id---редактировать-проект)
   - [6.4. `DELETE`](#64-delete)
-    - [6.4.1. `/api/groups/:project_id` - Удалить проект.](#641-apigroupsproject_id---удалить-проект)
+    - [6.4.1. `/api/project/:project_id` - Удалить проект.](#641-apiprojectproject_id---удалить-проект)
 - [7. Tasks](#7-tasks)
   - [7.1. `GET`](#71-get)
     - [7.1.1. `/api/tasks/:project_id` - Взять задачи из проекта.](#711-apitasksproject_id---взять-задачи-из-проекта)
@@ -301,7 +301,7 @@ Note:
 ```
 
 ## 6.4. `DELETE`
-### 6.4.1. `/api/groups/:project_id` - Удалить проект.
+### 6.4.1. `/api/project/:project_id` - Удалить проект.
 
 - [x] Необходима авторизация.
 

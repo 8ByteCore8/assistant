@@ -53,14 +53,8 @@ export class Attempt extends Model {
     })
     state: AttemptStates;
 
-    @Column({
-        name: "created_at",
-    })
-    created_at: Date;
-
     @BeforeInsert()
     beforeInsert() {
-        this.created_at = new Date();
         this.state = this.validator ? AttemptStates.PendingAutoChecking : AttemptStates.PendingChecking;
     }
 }

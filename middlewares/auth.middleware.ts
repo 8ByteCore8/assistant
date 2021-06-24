@@ -4,7 +4,6 @@ import { Request, Response } from "../types";
 import configs from "../config";
 import { User } from "../models/account/User";
 import { NextHandleFunction } from 'connect';
-import { getRepository } from "typeorm";
 import { NextFunction } from "express";
 import { PermissionsDeniedError } from "../errors";
 
@@ -56,9 +55,9 @@ export function auth(): NextHandleFunction {
 export function loginRequired(): NextHandleFunction {
     return async function (request: Request, response: Response, next: NextFunction) {
         try {
-            if (!response.locals["user"])
-                throw new PermissionsDeniedError();
-            return next();
+            if (response.locals["user"] !== null)
+                return next();
+            throw new PermissionsDeniedError();
         }
         catch (error) {
             return next(error);

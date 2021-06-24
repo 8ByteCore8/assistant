@@ -22,7 +22,7 @@ export default Router()
                 });
 
                 return response.status(200).json(
-                    Task.toFlat(_tasks, [
+                    await Task.toFlat(_tasks, [
                         "id",
                         "name",
                         "description",

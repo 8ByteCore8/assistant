@@ -1,4 +1,4 @@
-import { BaseEntity, DeepPartial, ObjectType } from "typeorm";
+import { BaseEntity, CreateDateColumn, DeepPartial, DeleteDateColumn, ObjectType, UpdateDateColumn } from "typeorm";
 import { getClassName } from "../utils";
 
 export type Relations<T> = {
@@ -14,6 +14,15 @@ export abstract class Model extends BaseEntity {
     static getModelName<T>(model: ObjectType<T> = this): string {
         return getClassName(model).toLowerCase();
     }
+
+    @DeleteDateColumn()
+    public deleted_at: Date;
+
+    @CreateDateColumn()
+    public created_at: Date;
+
+    @UpdateDateColumn()
+    public updated_at: Date;
 
 
     static toFlat<T>(instances: T[], fields: (keyof T)[], relations?: Relations<T>): Promise<object[]>;
