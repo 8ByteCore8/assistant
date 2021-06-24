@@ -62,7 +62,7 @@
     left: 0;
     background-color: #fff;
     border: 1px solid #c1c1c1;
-    width: 156px;
+    width: 100%;
 }
 
 .headerProfileDropdown li{
@@ -76,5 +76,29 @@
 }
 
 .headerProfileDropdown li svg{
+    margin-right: 5px;
+}
+
+
+
+
+
+.headerNotifications, .headerChat{
+    display: flex;
+    align-items: center;
+    font-size: 19px;
+    cursor: pointer;
+    padding: 0 5px;
+}
+
+.headerNotifications:hover, .headerChat:hover{
+    color: #000;
+}
+
+.headerNotifications{
+    margin-right: 5px;
+}
+
+.headerChat{
     margin-right: 5px;
 }

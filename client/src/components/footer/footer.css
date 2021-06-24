@@ -1,0 +1,22 @@
+.footer-wrapper{
+    background-color: #fff;
+    border-top: 1px solid #c1c1c1;
+}
+
+.footer{
+    height: 80px;
+    display: flex;
+    align-items: center;
+}
+
+.footer .callback{
+    text-align: right;
+}
+
+.footer .lider{
+    text-align: center;
+}
+
+.footer a{
+    text-decoration: underline;
+}

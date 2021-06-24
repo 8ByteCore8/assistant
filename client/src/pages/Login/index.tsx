@@ -31,7 +31,7 @@ const Login = (props: any) => {
                 })
                 dispatch(setAuthorizationStatus("authorized"));
             } else {
-                if (body.error === "Invalid login data.") {
+                if (body.error === "Permissions denied") {
                     setError("Невірно введено ім'я користувача або пароль.")
                 } else {
                     setError("Невідома помилка сервера. Спробуйте пізніше.")

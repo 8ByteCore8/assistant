@@ -7,3 +7,64 @@
     margin-top: 25px;
     margin-bottom: 50px;
 }
+
+.taskAccordion{
+    box-shadow: none!important;
+}
+
+.taskAccordion .MuiAccordionSummary-root{
+    padding: 0 !important;
+    /*border-top: 1px solid #e0e0e0;*/
+}
+
+.taskAccordion .MuiAccordionDetails-root{
+    padding: 8px 0 16px !important;
+}
+
+.MuiAccordion-root:before{
+    opacity: 0 !important;
+}
+
+.taskContentWrapper{
+    width: 100%;
+}
+
+.taskName{
+    margin: 6px 0;
+    font-weight: 600;
+    font-size: 1.25em;
+    display: flex;
+    align-items: center;
+}
+
+.taskName i{
+    background-color: #1a3c66;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+    font-size: 0.85em;
+}
+
+.taskTitle{
+    font-weight: 400;
+    font-size: 1.20em;
+    margin: 20px 0;
+}
+
+.taskTitle.first{
+    margin-top: 0;
+}
+
+.attemptsTable{
+    margin-top: 10px;
+    font-size: 0.87em;
+}
+
+.table td, .table th{
+    padding: .85rem;
+}

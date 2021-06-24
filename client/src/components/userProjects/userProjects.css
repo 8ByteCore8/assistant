@@ -31,6 +31,10 @@
     color: #28344C;
 }
 
+.userProjectBlockAuthor{
+    font-size: 0.93em;
+}
+
 .userProjectBlockImage{
     width: 100%;
     height: 150px !important;
@@ -48,3 +52,4 @@
     max-width: 150px;
     margin-bottom: 25px;
 }
+

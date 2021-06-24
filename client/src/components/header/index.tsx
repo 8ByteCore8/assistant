@@ -4,7 +4,7 @@ import {Link} from "react-router-dom";
 import {setAuthorizationStatus} from "../../reducers/userReducer";
 import {useDispatch, useSelector} from "react-redux";
 import {useCookies} from "react-cookie";
-import {PersonCircle, PersonBoundingBox, BoxArrowRight, Gear} from 'react-bootstrap-icons';
+import {PersonCircle, PersonBoundingBox, BoxArrowRight, Gear, Bell, Chat} from 'react-bootstrap-icons';
 
 const Header = (props: any) => {
     const dispatch = useDispatch();
@@ -21,8 +21,14 @@ const Header = (props: any) => {
         <header className="headerWrapper">
             <div className="container">
                 <div className="row headerContent">
-                    <div className="col-9"><Link to="/" className="logoText">ASSISTANT</Link></div>
-                    <div className="col-3 headerProfileWrapper">
+                    <div className="col-8"><Link to="/" className="logoText">ASSISTANT</Link></div>
+                    <div className="col-4 headerProfileWrapper">
+                        <div className="headerNotifications">
+                            <Bell/>
+                        </div>
+                        <div className="headerChat">
+                            <Chat/>
+                        </div>
                         <div className="headerProfile">
                             {userData.lastname} {userData.name} <PersonCircle className="headerPersonIcon"/>
                             <ul className="headerProfileDropdown">

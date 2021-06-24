@@ -48,10 +48,11 @@ const UserProjects = (props: any) => {
                 <div className="userProjectList">
                     {projectList.map((e) => {
                         return (
-                            <Link key={e.id} to="/project/1" className="userProjectBlock">
+                            <Link key={e.id} to={`/project/${e.id}`} className="userProjectBlock">
                                 <div style={{backgroundImage: `url(${BackgroundImage})`}}
                                      className="userProjectBlockImage"/>
                                 <div className="userProjectBlockInfo">
+                                    <div className="userProjectBlockAuthor">{e.author.lastname} {e.author.name}</div>
                                     <div className="userProjectBlockName">{e.name}</div>
                                 </div>
                             </Link>
