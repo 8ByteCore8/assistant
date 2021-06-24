@@ -23,20 +23,17 @@ async function CreateSuperUser(user_data: DeepPartial<User>) {
         stripUnknown: true,
     });
 
-    const repository = getRepository(User);
-    const roleRepository = getRepository(Role);
-
-    let user = repository.create(user_data);
+    let user = User.create(user_data);
     user.superuser = true;
 
-    user.role = <any>await roleRepository.findOneOrFail({
+    user.role = <any>await Role.findOneOrFail({
         where: {
             "name": "Admins"
         }
     });
 
     user = await User.setPassword(user, user_data["password"]);
-    user = await repository.save(user);
+    user = await User.save(user);
 
     console.log("Created user:\n", user);
 }

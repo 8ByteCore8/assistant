@@ -78,12 +78,12 @@ export default Router()
                 const { task } = request.body;
                 let _task = await Task.findOneOrFail(task);
 
-                await Attempt.save({
+                await Attempt.save(Attempt.create({
                     ...request.body,
                     task: <any>_task,
                     user: <any>response.locals["user"],
                     validator: _task.validator,
-                });
+                }));
 
                 return response.status(200).send();
             } catch (error) {

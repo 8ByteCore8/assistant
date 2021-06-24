@@ -35,9 +35,9 @@ export default express.Router()
         async function (request: Request, response: Response, next: NextFunction) {
             try {
 
-                await Group.save({
+                await Group.save(Group.create({
                     ...request.body
-                });
+                }));
 
                 return response.status(200).send();
             } catch (error) {

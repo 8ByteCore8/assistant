@@ -94,16 +94,16 @@ export default express.Router()
                 });
 
                 // Создание нового пользователя.
-                let user = User.create({
+                let _user = User.create({
                     ...request.body
                 } as Object);
 
                 // Генерация и установка пароля.
                 let _password = createPassword();
-                user = await User.setPassword(user, _password);
+                _user = await User.setPassword(_user, _password);
 
                 // Сохранение.
-                await User.save(user);
+                await User.save(_user);
 
                 // Отправка ответа
                 return response.status(200).json({

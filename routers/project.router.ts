@@ -34,6 +34,11 @@ export default Router()
                     _projects = await _group.projects;
                 }
 
+                console.log(_projects);
+                console.log(await _projects[0].author);
+                console.log(await _projects[0].groups);
+
+
                 return response.status(200).json(
                     await Project.toFlat(_projects, [
                         "id",
@@ -72,13 +77,13 @@ export default Router()
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
+                console.log(response.locals["user"]);
+
                 request.body["groups"] = await Group.find({
                     where: {
                         id: In(request.body["groups"])
                     }
                 });
-
-                console.log(request.body["groups"]);
 
                 request.body["tasks"] = await Task.find({
                     where: {
@@ -87,9 +92,9 @@ export default Router()
                 });
                 request.body["author"] = response.locals["user"];
 
-                await Project.save({
+                await Project.save(Project.create({
                     ...request.body,
-                });
+                }));
 
 
                 return response.status(200).send();

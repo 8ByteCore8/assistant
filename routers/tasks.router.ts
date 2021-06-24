@@ -47,9 +47,9 @@ export default Router()
 
                 request.body["project"] = await Project.findOneOrFail(request.body["project"]);
 
-                await Task.save({
+                await Task.save(Task.create({
                     ...request.body,
-                });
+                }));
 
                 return response.status(200).send();
             } catch (error) {
