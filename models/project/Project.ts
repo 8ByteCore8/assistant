@@ -3,15 +3,13 @@ import { Model } from "..";
 import { Group } from "../account/Group";
 import { User } from "../account/User";
 import { Task } from "./Task";
+import Variant from "./Variant";
 
 /**
  * Проекты. По факту категория 
  */
 @Entity({
     name: "projects",
-    orderBy: {
-        name: "ASC",
-    }
 })
 export class Project extends Model {
     @PrimaryGeneratedColumn({
@@ -42,4 +40,17 @@ export class Project extends Model {
 
     @ManyToOne(() => User)
     author: Promise<User>;
+
+    @OneToMany(() => Variant, variant => variant.project)
+    variants: Promise<Variant[]>;
+
+    @Column({
+        length: 255,
+    })
+    variant_generator: string;
+
+    @Column({
+        length: 20000,
+    })
+    variant_sources: string;
 }

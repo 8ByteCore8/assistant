@@ -8,9 +8,6 @@ import { Project } from "../project/Project";
  */
 @Entity({
     name: "groups",
-    orderBy: {
-        name: "ASC"
-    }
 })
 export class Group extends Model {
 

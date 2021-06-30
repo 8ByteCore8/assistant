@@ -11,11 +11,7 @@ export enum AttemptStates {
 }
 
 @Entity({
-    name: "attempts",
-    orderBy: {
-        user: "ASC",
-        task: "ASC",
-    }
+    name: "attempts"
 })
 export class Attempt extends Model {
     @PrimaryGeneratedColumn({
@@ -42,19 +38,17 @@ export class Attempt extends Model {
     is_correct: boolean;
 
     @Column({
-        name: "validator",
-        nullable: true,
-        length: 50,
-    })
-    validator: string;
-
-    @Column({
         name: "state",
     })
     state: AttemptStates;
 
-    @BeforeInsert()
-    beforeInsert() {
-        this.state = this.validator ? AttemptStates.PendingAutoChecking : AttemptStates.PendingChecking;
-    }
+    @Column({
+        name: "error",
+        length: 255,
+        nullable: true,
+    })
+    error: string;
+
+    @ManyToOne(() => Attempt)
+    base: Promise<Attempt>;
 }

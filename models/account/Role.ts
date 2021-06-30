@@ -8,9 +8,6 @@ import { Permission } from "./Permission";
  */
  @Entity({
     name: "roles",
-    orderBy: {
-        name: "ASC"
-    },
 })
 export class Role extends Model {
 

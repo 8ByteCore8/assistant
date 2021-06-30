@@ -6,9 +6,6 @@ import { Model } from "..";
  */
  @Entity({
     name: "permissions",
-    orderBy: {
-        name: "ASC"
-    }
 })
 export class Permission extends Model {
 

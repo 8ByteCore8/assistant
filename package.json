@@ -6,7 +6,7 @@
   "scripts": {
     "start": "concurrently \"npm run start-*\"",
     "start-server": "ts-node ./index.ts",
-    "start-dev-server": "npm run db-init && npm run db-create-superuser && npm run start-server",
+    "dev-start-server": "npm run db-init && npm run db-create-superuser && npm run start-server",
     "start-client": "npm run start --prefix client",
     "build": "concurrently npm run build-*",
     "build-client": "npm run build --prefix client",
@@ -30,6 +30,7 @@
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "isolated-vm": "^4.3.2",
     "joi": "^17.4.0",
     "jsonwebtoken": "^8.5.1",
     "reflect-metadata": "^0.1.13",

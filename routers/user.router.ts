@@ -243,7 +243,6 @@ export default express.Router()
             }
         }
     )
-    // TODO: Пофиксить уязвимость с удалением одноранговых и выше пользователей.
     .delete("/:user_id",
         loginRequired(),
         hasPermissions([Permissions.teacher, Permissions.admin]),
@@ -252,6 +251,21 @@ export default express.Router()
                 const { user_id } = request.params;
 
                 let _user = await User.findOneOrFail(Number(user_id));
+
+                switch ((await _user.role).name) {
+                    case "Students":
+                        if (!await validatePermissions([Permissions.teacher, Permissions.admin], response.locals["user"], response.locals["permissions"]))
+                            throw new PermissionsDeniedError();
+                        break;
+                    case "Teachers":
+                        if (!await validatePermissions(Permissions.admin, response.locals["user"], response.locals["permissions"]))
+                            throw new PermissionsDeniedError();
+                        break;
+                    default:
+                        if (!await validatePermissions("", response.locals["user"], response.locals["permissions"]))
+                            throw new PermissionsDeniedError();
+                        break;
+                }
 
                 await Promise.all([
                     User.softRemove(_user),

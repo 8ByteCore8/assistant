@@ -7,6 +7,7 @@ import { hasPermissions } from "../middlewares/has-permitions.middleware";
 import { Project } from "../models/project/Project";
 import { Task } from "../models/project/Task";
 import { Attempt } from "../models/project/Attempt";
+import Validator from "../models/project/Validator";
 
 export default Router()
     .get("/:project_id",
@@ -39,13 +40,16 @@ export default Router()
         bodyValidation(Joi.object({
             name: Joi.string().trim().max(100).required(),
             description: Joi.string().trim().max(2000).required(),
-            validator: Joi.string().trim().max(50),
+            validator: Joi.number().integer().positive(),
             project: Joi.number().integer().positive().required(),
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
             try {
 
                 request.body["project"] = await Project.findOneOrFail(request.body["project"]);
+
+                if (request.body["validator"])
+                    request.body["validator"] = await Validator.findOneOrFail(request.body["validator"]);
 
                 await Task.save(Task.create({
                     ...request.body,
@@ -63,7 +67,7 @@ export default Router()
         bodyValidation(Joi.object({
             name: Joi.string().trim().max(100),
             description: Joi.string().trim().max(2000),
-            validator: Joi.string().trim().max(50),
+            validator: Joi.number().integer().positive(),
             project: Joi.number().integer().positive(),
         }).required()),
         async function (request: Request, response: Response, next: NextFunction) {
@@ -72,6 +76,9 @@ export default Router()
 
                 if (request.body["project"])
                     request.body["project"] = await Project.findOneOrFail(request.body["project"]);
+
+                if (request.body["validator"])
+                    request.body["validator"] = await Validator.findOneOrFail(request.body["validator"]);
 
                 let _task = await Task.findOneOrFail(Number(task_id));
 

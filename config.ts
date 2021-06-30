@@ -63,6 +63,11 @@ export type AppConfig = {
      * Конфигурации политики CORS.
      */
     cors?: CorsOptions;
+
+    validator: {
+        sleep: number;
+        timeout: number;
+    };
 };
 
 /**
@@ -90,6 +95,10 @@ const config: AppConfig = {
             migrationsDir: join(__dirname, "./migrations"),
             subscribersDir: join(__dirname, "./subscribers"),
         },
+    },
+    validator: {
+        sleep: 60000, // 1 мин
+        timeout: 60000, // 1 мин
     }
 };
 

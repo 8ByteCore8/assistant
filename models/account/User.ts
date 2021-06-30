@@ -1,5 +1,6 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { AbstractUser } from ".";
+import Variant from "../project/Variant";
 import { Group } from "./Group";
 
 /**
@@ -7,11 +8,6 @@ import { Group } from "./Group";
  */
 @Entity({
     name: "users",
-    orderBy: {
-        lastname: "ASC",
-        name: "ASC",
-        surname: "ASC",
-    },
 })
 export class User extends AbstractUser {
 
@@ -50,4 +46,7 @@ export class User extends AbstractUser {
 
     @ManyToOne(() => Group, group => group.users)
     public group: Promise<Group>;
+
+    @OneToMany(()=>Variant,variant=>variant.user)
+    variants: Promise<Variant[]>;
 }

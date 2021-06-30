@@ -7,6 +7,8 @@ import { hasPermissions } from "../middlewares/has-permitions.middleware";
 import { Attempt, AttemptStates } from "../models/project/Attempt";
 import { Task } from "../models/project/Task";
 
+// TODO: Сделать взятие попыток для зависимотей
+
 export default Router()
     .get("/:task_id",
         loginRequired(),
